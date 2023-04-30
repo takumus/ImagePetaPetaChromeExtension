@@ -18,12 +18,12 @@
     "vite": "^4.1.4"
   },
   "scripts": {
-    "build": "vite build --watch"
+    "build": "vite build",
+    "dev": "vite build --watch"
   },
   "author": "",
   "volta": {
     "node": "19.9.0",
-    "yarn": "1.22.19",
     "npm": "9.6.3"
   },
   "dependencies": {
