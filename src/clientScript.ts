@@ -21,37 +21,30 @@ export function clientScript() {
     if (event.target?.getAttribute("data-imagepetapeta-saved") === "true") {
       return;
     }
-    const elements = Array.from(document.querySelectorAll("*")).filter(
-      (element) => {
-        const rect = element.getBoundingClientRect();
-        if (
-          rect.left < event.clientX &&
-          rect.right > event.clientX &&
-          rect.top < event.clientY &&
-          rect.bottom > event.clientY
-        ) {
-          if (!(element instanceof HTMLImageElement)) {
-            return;
-          }
-          if (element.src !== undefined || element.srcset !== undefined) {
-            return true;
-          }
-        }
-        return false;
-      }
+    const element = document.elementFromPoint(
+      event.clientX,
+      event.clientY
+    ) as HTMLElement | null;
+    if (element == null) {
+      return;
+    }
+    const style = window.getComputedStyle(element);
+    const regexp = /url\(['"]?((?:\S*?\(\S*?\))*\S*?)['"]?\)/g;
+    const urls = Array.from(
+      new Set([
+        ...[...style.backgroundImage.matchAll(regexp)].map((v) => v[1]),
+        ...[...style.background.matchAll(regexp)].map((v) => v[1]),
+      ])
     );
-    const element = (elements[
-      elements.indexOf(document.elementFromPoint(event.clientX, event.clientY)!)
-    ] ?? elements[0]) as HTMLElement;
-    console.log(element);
     chrome.runtime.sendMessage(
       {
         type: "save",
         html: element.outerHTML,
+        styleURLs: urls,
       },
       (res) => {
         if (res === undefined) {
-          alert("タイムアウト");
+          alert("保存失敗");
           return;
         }
         console.log(res);

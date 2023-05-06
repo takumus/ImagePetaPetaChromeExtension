@@ -27,6 +27,6 @@
     "npm": "9.6.3"
   },
   "dependencies": {
-    "imagepetapeta-beta": "https://github.com/takumus/ImagePetaPeta"
+    "imagepetapeta-beta": "github:takumus/ImagePetaPeta"
   }
 }
