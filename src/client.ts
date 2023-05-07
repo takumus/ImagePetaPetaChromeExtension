@@ -40,7 +40,7 @@ function clientScript() {
     chrome.runtime.sendMessage(
       {
         type: "save",
-        referrer: document.referrer,
+        referrer: window.location.origin,
         urls,
       },
       (res) => {

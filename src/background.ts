@@ -8,7 +8,7 @@ chrome.runtime.onMessage.addListener((request, _, response) => {
         (url: string) =>
           ({
             type: "url",
-            referrer: window.location.origin,
+            referrer: request.referrer,
             url,
           } as const)
       ),
