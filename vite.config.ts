@@ -1,6 +1,7 @@
 import { rmSync } from "node:fs";
 import { resolve } from "path";
 import { defineConfig } from "vite";
+import nodePolyfills from "vite-plugin-node-stdlib-browser";
 
 export default defineConfig(async ({ command }) => {
   return {
@@ -9,14 +10,14 @@ export default defineConfig(async ({ command }) => {
       outDir: resolve("./dist/js"),
       emptyOutDir: true,
       lib: {
-        entry: resolve("./src/index.ts"),
+        entry: [resolve("./src/background.ts"), resolve("./src/client.ts")],
         formats: ["es"],
-        fileName: "background",
+        // fileName: "background",
       },
     },
     resolve: {
       alias: [{ find: "@", replacement: resolve("./src/") }],
     },
-    plugins: [],
+    plugins: [nodePolyfills()],
   };
 });

@@ -1,19 +1,14 @@
-import { clientScript } from "./clientScript";
 import { post } from "./post";
-import { getURLFromHTML } from "imagepetapeta-beta/src/renderer/utils/getURLFromHTML";
 
 chrome.runtime.onMessage.addListener((request, _, response) => {
-  const url = getURLFromHTML(request.html);
-  if (url === undefined && request.styleURLs.length === 0) {
-    return false;
-  }
-  const urls = [...(url !== undefined ? [url] : []), ...request.styleURLs];
+  console.log(request);
   post("importFiles", [
     [
-      ...urls.map(
+      ...request.urls.map(
         (url: string) =>
           ({
             type: "url",
+            referrer: window.location.origin,
             url,
           } as const)
       ),
@@ -32,7 +27,11 @@ chrome.action.onClicked.addListener((tab) => {
   if (!tab.url?.includes("chrome://")) {
     chrome.scripting.executeScript({
       target: { tabId: tab.id! },
-      func: clientScript,
+      files: ["./js/client.mjs"],
     });
+    // console.log(chrome.devtools.inspectedWindow);
+    // chrome.devtools.network.onRequestFinished.addListener((request) => {
+    //   console.log(request);
+    // });
   }
 });

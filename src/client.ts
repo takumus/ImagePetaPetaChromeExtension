@@ -1,4 +1,6 @@
-export function clientScript() {
+import { getURLFromHTML } from "imagepetapeta-beta/src/renderer/utils/getURLFromHTML";
+
+function clientScript() {
   if ((window as any)["imagepetapeta-extension"] === true) {
     return;
   }
@@ -11,6 +13,7 @@ export function clientScript() {
   footer.style.color = "#ffffff";
   footer.style.padding = "16px";
   footer.style.backgroundColor = "rgba(0,0,0,0.5)";
+  footer.style.pointerEvents = "none";
   footer.innerHTML = "ImagePetaPeta Enabled";
   document.body.appendChild(footer);
   document.body.addEventListener("contextmenu", (event) => {
@@ -28,19 +31,17 @@ export function clientScript() {
     if (element == null) {
       return;
     }
-    const style = window.getComputedStyle(element);
-    const regexp = /url\(['"]?((?:\S*?\(\S*?\))*\S*?)['"]?\)/g;
     const urls = Array.from(
       new Set([
-        ...[...style.backgroundImage.matchAll(regexp)].map((v) => v[1]),
-        ...[...style.background.matchAll(regexp)].map((v) => v[1]),
+        ...[getURLFromHTML(element.outerHTML)],
+        ...getURLFromStyle(window.getComputedStyle(element)),
       ])
-    );
+    ).filter((url) => url !== undefined) as string[];
     chrome.runtime.sendMessage(
       {
         type: "save",
-        html: element.outerHTML,
-        styleURLs: urls,
+        referrer: document.referrer,
+        urls,
       },
       (res) => {
         if (res === undefined) {
@@ -56,3 +57,13 @@ export function clientScript() {
     );
   });
 }
+function getURLFromStyle(style: CSSStyleDeclaration) {
+  const regexp = /url\(['"]?((?:\S*?\(\S*?\))*\S*?)['"]?\)/g;
+  return Array.from(
+    new Set([
+      ...[...style.backgroundImage.matchAll(regexp)].map((v) => v[1]),
+      ...[...style.background.matchAll(regexp)].map((v) => v[1]),
+    ])
+  );
+}
+clientScript();
