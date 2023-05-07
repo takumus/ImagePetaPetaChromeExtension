@@ -1,4 +1,5 @@
 import { getURLFromHTML } from "imagepetapeta-beta/src/renderer/utils/getURLFromHTML";
+import urlJoin from "url-join";
 
 function clientScript() {
   if ((window as any)["imagepetapeta-extension"] === true) {
@@ -41,7 +42,12 @@ function clientScript() {
       {
         type: "save",
         referrer: window.location.origin,
-        urls,
+        urls: urls.map((url) => {
+          if (url.startsWith("http://") || url.startsWith("https://")) {
+            return url;
+          }
+          return urlJoin(location.href, url);
+        }),
       },
       (res) => {
         if (res === undefined) {

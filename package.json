@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "file-type": "^18.3.0",
-    "imagepetapeta-beta": "github:takumus/ImagePetaPeta"
+    "imagepetapeta-beta": "github:takumus/ImagePetaPeta",
+    "url-join": "^5.0.0"
   }
 }
