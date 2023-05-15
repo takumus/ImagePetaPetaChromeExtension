@@ -3,10 +3,10 @@
   <button @click="enable">ENABLE</button>
 </template>
 <script setup lang="ts">
+import { sendToBackground } from "../sendToBackground";
+
 const a = 1;
 function enable() {
-  chrome.runtime.sendMessage({
-    type: "enable",
-  });
+  sendToBackground("enable");
 }
 </script>

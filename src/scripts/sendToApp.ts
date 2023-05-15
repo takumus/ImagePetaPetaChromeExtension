@@ -1,6 +1,6 @@
 import { IpcFunctions } from "imagepetapeta-beta/src/commons/ipc/ipcFunctions";
 
-export async function post<U extends keyof IpcFunctions>(
+export async function sendToApp<U extends keyof IpcFunctions>(
   event: U,
   ...args: Parameters<IpcFunctions[U]>
 ): Promise<Awaited<ReturnType<IpcFunctions[U]>>> {

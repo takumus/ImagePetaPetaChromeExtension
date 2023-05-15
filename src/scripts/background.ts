@@ -1,43 +1,46 @@
-import { post } from "./post";
+import { Messages } from "@/backgroundMessages";
+import { sendToApp } from "@/scripts/sendToApp";
 
-chrome.runtime.onMessage.addListener((request, _, response) => {
-  console.log(request);
-  (async () => {
-    if (request.type === "enable") {
-      console.log("enable");
-      const tab = await getCurrentTab();
-      chrome.scripting.executeScript({
-        target: { tabId: tab.id! },
-        files: ["./js/client.mjs"],
-      });
-    } else if (request.type === "save") {
-      post("importFiles", [
+const messageFunctions: Messages = {
+  async enable() {
+    const tab = await getCurrentTab();
+    chrome.scripting.executeScript({
+      target: { tabId: tab.id! },
+      files: ["./scripts/client.mjs"],
+    });
+  },
+  async save(urls, referrer) {
+    try {
+      const result = await sendToApp("importFiles", [
         [
-          ...request.urls.map(
+          ...urls.map(
             (url: string) =>
               ({
                 type: "url",
-                referrer: request.referrer,
+                referrer: referrer,
                 url,
               } as const)
           ),
         ],
-      ])
-        .then((ids) => {
-          console.log(ids);
-          response(ids);
-        })
-        .catch((reason) => {
-          response(undefined);
-        });
+      ]);
+      return result;
+    } catch {
+      return [];
     }
-  })();
+  },
+};
+
+chrome.runtime.onMessage.addListener((request, _, response) => {
+  console.log(`type: ${request.type}, args: ${request.args}`);
+  (messageFunctions as any)[request.type](...request.args).then((res: any) => {
+    console.log(`res: ${res}`);
+    response(res);
+  });
   return true;
 });
 
 async function getCurrentTab() {
   let queryOptions = { active: true, lastFocusedWindow: true };
-  // `tab` will either be a `tabs.Tab` instance or `undefined`.
   let [tab] = await chrome.tabs.query(queryOptions);
   return tab;
 }

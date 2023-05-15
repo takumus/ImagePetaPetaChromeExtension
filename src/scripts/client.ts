@@ -1,3 +1,4 @@
+import { sendToBackground } from "@/sendToBackground";
 import { getURLFromHTML } from "imagepetapeta-beta/src/renderer/utils/getURLFromHTML";
 import urlJoin from "url-join";
 
@@ -38,29 +39,26 @@ function clientScript() {
         ...getURLFromStyle(window.getComputedStyle(element)),
       ])
     ).filter((url) => url !== undefined) as string[];
-    chrome.runtime.sendMessage(
-      {
-        type: "save",
-        referrer: window.location.origin,
-        urls: urls.map((url) => {
-          if (url.startsWith("http://") || url.startsWith("https://")) {
-            return url;
-          }
-          return urlJoin(location.href, url);
-        }),
-      },
-      (res) => {
-        if (res === undefined) {
-          alert("保存失敗");
-          return;
+    sendToBackground(
+      "save",
+      urls.map((url) => {
+        if (url.startsWith("http://") || url.startsWith("https://")) {
+          return url;
         }
-        console.log(res);
-        if (res.length > 0) {
-          element.setAttribute("data-imagepetapeta-saved", "true");
-          element.style.filter = "invert(100%)";
-        }
+        return urlJoin(location.href, url);
+      }),
+      window.location.origin
+    ).then((ids) => {
+      if (ids === undefined) {
+        alert("保存失敗");
+        return;
       }
-    );
+      console.log(ids);
+      if (ids.length > 0) {
+        element.setAttribute("data-imagepetapeta-saved", "true");
+        element.style.filter = "invert(100%)";
+      }
+    });
   });
 }
 function getURLFromStyle(style: CSSStyleDeclaration) {

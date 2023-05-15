@@ -12,6 +12,9 @@ export default defineConfig({
     outDir: resolve("./dist/popup"),
     rollupOptions: {},
   },
+  resolve: {
+    alias: [{ find: "@", replacement: resolve("./src/") }],
+  },
   plugins: [
     vue({
       template: {
