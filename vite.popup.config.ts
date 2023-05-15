@@ -10,6 +10,7 @@ export default defineConfig({
   build: {
     emptyOutDir: true,
     outDir: resolve("./dist/popup"),
+    minify: false,
     rollupOptions: {},
   },
   resolve: {
