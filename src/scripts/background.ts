@@ -54,23 +54,22 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
           ),
         ],
       ]);
-      console.log(result);
-      // return result;
+      console.log("imported:", result);
     } catch {
-      // return [];
+      //
     }
   }
 });
-const updateContextMenus = async () => {
-  await chrome.contextMenus.removeAll();
-  chrome.contextMenus.create({
-    id: "save",
-    title: "画像を保存",
-    contexts: ["all"],
-  });
-};
 
-chrome.runtime.onInstalled.addListener(updateContextMenus);
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.contextMenus.removeAll(() => {
+    chrome.contextMenus.create({
+      id: "save",
+      title: "画像を保存",
+      contexts: ["all"],
+    });
+  });
+});
 async function getCurrentTab() {
   let queryOptions = { active: true, lastFocusedWindow: true };
   let [tab] = await chrome.tabs.query(queryOptions);
