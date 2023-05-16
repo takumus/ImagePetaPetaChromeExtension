@@ -1,12 +1,8 @@
 <template>
-  <e-root> <button @click="enable">このページから画像を探す</button></e-root>
+  <e-root>ImagePetaPeta</e-root>
 </template>
 <script setup lang="ts">
 import { sendToBackground } from "@/sendToBackground";
-
-function enable() {
-  sendToBackground("enable");
-}
 </script>
 <style lang="scss">
 html,

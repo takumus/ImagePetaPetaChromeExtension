@@ -1,29 +1,34 @@
 import { sendToBackground } from "@/sendToBackground";
 import { getURLFromHTML } from "imagepetapeta-beta/src/renderer/utils/getURLFromHTML";
-import urlJoin from "url-join";
 
-function clientScript() {
+(async () => {
   if ((window as any)["imagepetapeta-extension"] === true) {
     return;
   }
+  function getURLFromStyle(style: CSSStyleDeclaration) {
+    const regexp = /url\(['"]?((?:\S*?\(\S*?\))*\S*?)['"]?\)/g;
+    return Array.from(
+      new Set([
+        ...[...style.backgroundImage.matchAll(regexp)].map((v) => v[1]),
+        ...[...style.background.matchAll(regexp)].map((v) => v[1]),
+      ])
+    );
+  }
+
   (window as any)["imagepetapeta-extension"] = true;
-  const footer = document.createElement("div");
-  footer.style.position = "fixed";
-  footer.style.width = "100%";
-  footer.style.zIndex = "9999";
-  footer.style.bottom = "0px";
-  footer.style.color = "#ffffff";
-  footer.style.padding = "16px";
-  footer.style.backgroundColor = "rgba(0,0,0,0.5)";
-  footer.style.pointerEvents = "none";
-  footer.innerHTML = "ImagePetaPeta Enabled";
-  document.body.appendChild(footer);
-  document.body.addEventListener("contextmenu", (event) => {
-    event.preventDefault();
+  // const footer = document.createElement("div");
+  // footer.style.position = "fixed";
+  // footer.style.width = "100%";
+  // footer.style.zIndex = "9999";
+  // footer.style.bottom = "0px";
+  // footer.style.color = "#ffffff";
+  // footer.style.padding = "16px";
+  // footer.style.backgroundColor = "rgba(0,0,0,0.5)";
+  // footer.style.pointerEvents = "none";
+  // footer.innerHTML = "ImagePetaPeta Enabled";
+  // document.body.appendChild(footer);
+  window.addEventListener("contextmenu", (event) => {
     if (!(event.target instanceof HTMLElement)) {
-      return;
-    }
-    if (event.target?.getAttribute("data-imagepetapeta-saved") === "true") {
       return;
     }
     const element = document.elementFromPoint(
@@ -40,34 +45,19 @@ function clientScript() {
       ])
     ).filter((url) => url !== undefined) as string[];
     sendToBackground(
-      "save",
-      urls.map((url) => {
-        if (url.startsWith("http://") || url.startsWith("https://")) {
-          return url;
-        }
-        return urlJoin(location.href, url);
-      }),
+      "orderSave",
+      urls.map((url) => new URL(url, location.href).href),
       window.location.origin
-    ).then((ids) => {
-      if (ids === undefined) {
-        alert("保存失敗");
-        return;
-      }
-      console.log(ids);
-      if (ids.length > 0) {
-        element.setAttribute("data-imagepetapeta-saved", "true");
-        element.style.filter = "invert(100%)";
-      }
+    ).then(() => {
+      // if (ids === undefined) {
+      //   alert("保存失敗");
+      //   return;
+      // }
+      // console.log(ids);
+      // if (ids.length > 0) {
+      //   element.setAttribute("data-imagepetapeta-saved", "true");
+      //   element.style.filter = "invert(100%)";
+      // }
     });
   });
-}
-function getURLFromStyle(style: CSSStyleDeclaration) {
-  const regexp = /url\(['"]?((?:\S*?\(\S*?\))*\S*?)['"]?\)/g;
-  return Array.from(
-    new Set([
-      ...[...style.backgroundImage.matchAll(regexp)].map((v) => v[1]),
-      ...[...style.background.matchAll(regexp)].map((v) => v[1]),
-    ])
-  );
-}
-clientScript();
+})();

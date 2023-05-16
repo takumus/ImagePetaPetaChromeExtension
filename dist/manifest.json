@@ -1,7 +1,7 @@
 {
   "name": "ImagePetaPeta",
   "action": {
-    "default_title": "タイトルとURLをコピー",
+    "default_title": "ImagePetaPeta",
     "default_icon": "icon48.png",
     "default_popup": "popup/index.html"
   },
@@ -10,9 +10,12 @@
   "description": "ImagePetaPeta",
   "permissions": [
     "tabs",
-    "scripting"
+    "scripting",
+    "contextMenus"
   ],
-  "host_permissions": ["<all_urls>"],
+  "host_permissions": [
+    "<all_urls>"
+  ],
   "background": {
     "service_worker": "scripts/background.mjs",
     "type": "module"
