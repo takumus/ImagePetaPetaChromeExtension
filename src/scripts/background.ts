@@ -1,12 +1,23 @@
 import { Messages } from "@/backgroundMessages";
 import { sendToApp } from "@/scripts/sendToApp";
+import {
+  ImportFileAdditionalData,
+  ImportFileGroup,
+} from "imagepetapeta-beta/src/commons/datas/importFileGroup";
 
-let order: { urls: string[]; referrer: string } | undefined;
+let order:
+  | {
+      urls: string[];
+      referrer: string;
+      additionalData?: ImportFileAdditionalData;
+    }
+  | undefined;
 const messageFunctions: Messages = {
-  async orderSave(urls, referrer) {
+  async orderSave(urls, referrer, additionalData) {
     order = {
       urls,
       referrer,
+      additionalData,
     };
   },
 };
@@ -39,7 +50,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     if (order === undefined) {
       return;
     }
-    const { urls, referrer } = order;
+    const { urls, referrer, additionalData } = order;
     order = undefined;
     try {
       const result = await sendToApp("importFiles", [
@@ -50,7 +61,8 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
                 type: "url",
                 referrer: referrer,
                 url,
-              } as const)
+                additionalData,
+              } as ImportFileGroup[number])
           ),
         ],
       ]);

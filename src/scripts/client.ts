@@ -38,6 +38,17 @@ import { getURLFromHTML } from "imagepetapeta-beta/src/renderer/utils/getURLFrom
     if (element == null) {
       return;
     }
+    const elementAlt = element.getAttribute("alt")?.trim();
+    const pageTitle = document.title.trim();
+    const name = (() => {
+      if (elementAlt !== "") {
+        return elementAlt;
+      }
+      if (pageTitle !== "") {
+        return pageTitle;
+      }
+      return "download";
+    })();
     const urls = Array.from(
       new Set([
         ...[getURLFromHTML(element.outerHTML)],
@@ -47,7 +58,11 @@ import { getURLFromHTML } from "imagepetapeta-beta/src/renderer/utils/getURLFrom
     sendToBackground(
       "orderSave",
       urls.map((url) => new URL(url, location.href).href),
-      window.location.origin
+      window.location.origin,
+      {
+        name,
+        note: location.href,
+      }
     ).then(() => {
       // if (ids === undefined) {
       //   alert("保存失敗");
