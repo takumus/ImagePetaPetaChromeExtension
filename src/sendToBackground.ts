@@ -4,13 +4,17 @@ export function sendToBackground<U extends keyof Messages>(
   type: U,
   ...args: Parameters<Messages[U]>
 ): ReturnType<Messages[U]> {
-  return new Promise((res) => {
-    chrome.runtime.sendMessage(
-      {
-        type,
-        args,
-      },
-      res
-    );
+  return new Promise((res, rej) => {
+    try {
+      chrome.runtime.sendMessage(
+        {
+          type,
+          args,
+        },
+        res
+      );
+    } catch (err) {
+      // rej(err);
+    }
   }) as any;
 }

@@ -12,6 +12,7 @@ let order:
       additionalData?: ImportFileAdditionalData;
     }
   | undefined;
+let enabled = false;
 const messageFunctions: Messages = {
   async orderSave(urls, referrer, additionalData) {
     order = {
@@ -19,6 +20,21 @@ const messageFunctions: Messages = {
       referrer,
       additionalData,
     };
+  },
+  async setEnable(value) {
+    enabled = value;
+    chrome.contextMenus.removeAll(() => {
+      if (value) {
+        chrome.contextMenus.create({
+          id: "save",
+          title: "画像を保存",
+          contexts: ["all"],
+        });
+      }
+    });
+  },
+  async getEnable() {
+    return enabled;
   },
 };
 async function inject(tabId: number) {
@@ -73,17 +89,12 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   }
 });
 
-chrome.runtime.onInstalled.addListener(() => {
-  chrome.contextMenus.removeAll(() => {
-    chrome.contextMenus.create({
-      id: "save",
-      title: "画像を保存",
-      contexts: ["all"],
-    });
-  });
-});
-async function getCurrentTab() {
-  let queryOptions = { active: true, lastFocusedWindow: true };
-  let [tab] = await chrome.tabs.query(queryOptions);
-  return tab;
-}
+// chrome.runtime.onInstalled.addListener(() => {
+//   chrome.contextMenus.removeAll(() => {
+//     chrome.contextMenus.create({
+//       id: "save",
+//       title: "画像を保存",
+//       contexts: ["all"],
+//     });
+//   });
+// });

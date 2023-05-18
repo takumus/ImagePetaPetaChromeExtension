@@ -6,4 +6,6 @@ export interface Messages {
     referrer: string,
     additional?: ImportFileAdditionalData
   ) => Promise<void>;
+  setEnable: (value: boolean) => Promise<void>;
+  getEnable: () => Promise<boolean>;
 }
