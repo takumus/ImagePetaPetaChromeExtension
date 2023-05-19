@@ -1,3 +1,4 @@
+// import { icon } from "@/scripts/icon";
 import { sendToBackground } from "@/sendToBackground";
 import { getURLFromHTML } from "imagepetapeta-beta/src/renderer/utils/getURLFromHTML";
 
@@ -7,17 +8,24 @@ import { getURLFromHTML } from "imagepetapeta-beta/src/renderer/utils/getURLFrom
   }
   (window as any)["imagepetapeta-extension"] = true;
   function createOverlay() {
+    const margin = 5;
     const overlay = document.createElement("div");
+    // const img = document.createElement("img");
+    // img.src = icon;
+    // overlay.appendChild(img);
     overlay.style.position = "fixed";
-    overlay.style.borderRadius = "4px";
-    overlay.style.border = "solid 2px #ff0000";
+    overlay.style.borderRadius = "6px";
+    overlay.style.border = `solid ${margin}px #ffffff`;
     overlay.style.zIndex = "2147483647";
+    overlay.style.margin = "0px";
+    overlay.style.padding = "0px";
     overlay.style.pointerEvents = "none";
+    overlay.style.boxShadow = `0px 0px 3px 3px rgba(0, 0, 0, 0.4), 0px 0px 3px 3px rgba(0, 0, 0, 0.4) inset`;
     document.body.appendChild(overlay);
     return {
       show(x: number, y: number, width: number, height: number) {
-        overlay.style.left = x + "px";
-        overlay.style.top = y + "px";
+        overlay.style.left = x - margin + "px";
+        overlay.style.top = y - margin + "px";
         overlay.style.width = width + "px";
         overlay.style.height = height + "px";
         overlay.style.display = "block";
@@ -28,11 +36,24 @@ import { getURLFromHTML } from "imagepetapeta-beta/src/renderer/utils/getURLFrom
     };
   }
   const overlay = createOverlay();
+  let clickedElement: HTMLElement | null;
   setInterval(async () => {
     if (!(await sendToBackground("getEnable"))) {
       overlay.hide();
+      clickedElement = null;
     }
   }, 1000);
+  setInterval(() => {
+    const clicledElementRect = clickedElement?.getBoundingClientRect();
+    if (clicledElementRect !== undefined) {
+      overlay.show(
+        clicledElementRect.x,
+        clicledElementRect.y,
+        clicledElementRect.width,
+        clicledElementRect.height
+      );
+    }
+  }, 100);
   function getURLFromStyle(style: CSSStyleDeclaration) {
     const regexp = /url\(['"]?((?:\S*?\(\S*?\))*\S*?)['"]?\)/g;
     return Array.from(
@@ -53,12 +74,13 @@ import { getURLFromHTML } from "imagepetapeta-beta/src/renderer/utils/getURLFrom
     async (event) => {
       if (event.button !== 2) {
         overlay.hide();
+        clickedElement = null;
         return;
       }
       if (!(await sendToBackground("getEnable"))) {
         return;
       }
-      const clickedElement = document.elementFromPoint(
+      clickedElement = document.elementFromPoint(
         event.clientX,
         event.clientY
       ) as HTMLElement | null;

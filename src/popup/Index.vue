@@ -1,6 +1,6 @@
 <template>
   <e-root>
-    <e-title>ImagePetaPeta</e-title>
+    <e-title><img :src="icon" /></e-title>
     <label>
       <e-label>有効</e-label>
       <input type="checkbox" v-model="enabled" />
@@ -8,6 +8,7 @@
   </e-root>
 </template>
 <script setup lang="ts">
+import { icon } from "@/scripts/icon";
 import { sendToBackground } from "@/sendToBackground";
 import { onMounted, ref, watch } from "vue";
 
