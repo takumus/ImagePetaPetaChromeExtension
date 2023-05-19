@@ -69,6 +69,21 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     const { urls, referrer, additionalData } = order;
     order = undefined;
     try {
+      await new Promise((res, rej) => {
+        sendToApp("getAppInfo").then(res);
+        setTimeout(rej, 1000);
+      });
+    } catch {
+      if (tab?.id) {
+        await chrome.scripting.executeScript({
+          target: { tabId: tab.id },
+          func: () => {
+            alert("ImagePetaPetaを起動してください。");
+          },
+        });
+      }
+    }
+    try {
       const result = await sendToApp("importFiles", [
         [
           ...urls.map(
