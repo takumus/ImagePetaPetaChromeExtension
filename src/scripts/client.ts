@@ -36,6 +36,7 @@ import { getURLFromHTML } from "imagepetapeta-beta/src/renderer/utils/getURLFrom
     };
   }
   const overlay = createOverlay();
+  overlay.hide();
   let clickedElement: HTMLElement | null;
   setInterval(async () => {
     if (!(await sendToBackground("getEnable"))) {
