@@ -1,4 +1,5 @@
 // import { icon } from "@/scripts/icon";
+import { getElementsOnPointer } from "@/scripts/client/getElementsOnPointer";
 import { getURLsFromElement } from "@/scripts/client/getURLsFromElement";
 import { Overlay } from "@/scripts/client/overlay";
 import { sendToBackground } from "@/sendToBackground";
@@ -33,51 +34,16 @@ import { sendToBackground } from "@/sendToBackground";
       if (!(await sendToBackground("getEnable"))) {
         return;
       }
-      clickedElement = document.elementFromPoint(
-        event.clientX,
-        event.clientY
-      ) as HTMLElement | null;
-      if (clickedElement == null) {
+      const elements = getElementsOnPointer({
+        x: event.clientX,
+        y: event.clientY,
+      });
+      if (elements === undefined) {
         return;
       }
-      const clicledElementRect = clickedElement.getBoundingClientRect();
-      overlay.show(clicledElementRect);
-      const allElements = Array.from(document.querySelectorAll("*")).filter(
-        (element) => {
-          if (element instanceof HTMLElement) {
-            const rect = element.getBoundingClientRect();
-            if (
-              rect.left < event.clientX &&
-              rect.right > event.clientX &&
-              rect.top < event.clientY &&
-              rect.bottom > event.clientY
-            ) {
-              return true;
-            }
-          }
-          return false;
-        }
-      ) as HTMLElement[];
-      allElements.sort((a, b) => {
-        const rectA = a.getBoundingClientRect();
-        const rectB = b.getBoundingClientRect();
-        const diffA =
-          Math.abs(clicledElementRect.left - rectA.left) +
-          Math.abs(clicledElementRect.right - rectA.right) +
-          Math.abs(clicledElementRect.top - rectA.top) +
-          Math.abs(clicledElementRect.bottom - rectA.bottom);
-        const diffB =
-          Math.abs(clicledElementRect.left - rectB.left) +
-          Math.abs(clicledElementRect.right - rectB.right) +
-          Math.abs(clicledElementRect.top - rectB.top) +
-          Math.abs(clicledElementRect.bottom - rectB.bottom);
-        const img =
-          (b instanceof HTMLImageElement ? 1 : -1) -
-          (a instanceof HTMLImageElement ? 1 : -1);
-        return (diffA > diffB ? 0.1 : -0.1) + img;
-      });
-      console.log(allElements);
-      const elementAlt = clickedElement.getAttribute("alt")?.trim();
+      clickedElement = elements.element;
+      console.log(elements);
+      const elementAlt = elements.element.getAttribute("alt")?.trim();
       const pageTitle = document.title.trim();
       const name = (() => {
         if (elementAlt !== "") {
@@ -91,7 +57,7 @@ import { sendToBackground } from "@/sendToBackground";
       let urls: string[] = [];
       Array.from(
         new Set(
-          [clickedElement, ...allElements].map((element) => {
+          [clickedElement, ...elements.elements].map((element) => {
             return getURLsFromElement(element);
           })
         )
@@ -106,6 +72,10 @@ import { sendToBackground } from "@/sendToBackground";
         (url) => new URL(url, location.href).href
       );
       console.log(urls);
+      if (urls.length < 1) {
+        alert("画像が見つかりません");
+        return;
+      }
       sendToBackground("orderSave", urls, window.location.origin, {
         name,
         note: location.href,
