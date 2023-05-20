@@ -11,10 +11,10 @@ export default defineConfig(async ({ command }) => {
       outDir: resolve("./dist/scripts"),
       emptyOutDir: true,
       lib: {
-        entry: [
-          resolve("./src/scripts/background.ts"),
-          resolve("./src/scripts/client.ts"),
-        ],
+        entry: {
+          background: resolve("./src/scripts/background/index.ts"),
+          client: resolve("./src/scripts/client/index.ts"),
+        },
         formats: ["es"],
         // fileName: "background",
       },

@@ -1,5 +1,5 @@
 import { Messages } from "@/backgroundMessages";
-import { sendToApp } from "@/scripts/sendToApp";
+import { sendToApp } from "@/commons/sendToApp";
 import {
   ImportFileAdditionalData,
   ImportFileGroup,

@@ -1,42 +1,14 @@
 // import { icon } from "@/scripts/icon";
+import { getURLsFromElement } from "@/scripts/client/getURLsFromElement";
+import { Overlay } from "@/scripts/client/overlay";
 import { sendToBackground } from "@/sendToBackground";
-import { getURLFromHTML } from "imagepetapeta-beta/src/renderer/utils/getURLFromHTML";
 
 (async () => {
   if ((window as any)["imagepetapeta-extension"] === true) {
     return;
   }
   (window as any)["imagepetapeta-extension"] = true;
-  function createOverlay() {
-    const margin = 5;
-    const overlay = document.createElement("div");
-    // const img = document.createElement("img");
-    // img.src = icon;
-    // overlay.appendChild(img);
-    overlay.style.position = "fixed";
-    overlay.style.borderRadius = "6px";
-    overlay.style.border = `solid ${margin}px #ffffff`;
-    overlay.style.zIndex = "2147483647";
-    overlay.style.margin = "0px";
-    overlay.style.padding = "0px";
-    overlay.style.pointerEvents = "none";
-    overlay.style.boxShadow = `0px 0px 3px 3px rgba(0, 0, 0, 0.4), 0px 0px 3px 3px rgba(0, 0, 0, 0.4) inset`;
-    document.body.appendChild(overlay);
-    return {
-      show(x: number, y: number, width: number, height: number) {
-        overlay.style.left = x - margin + "px";
-        overlay.style.top = y - margin + "px";
-        overlay.style.width = width + "px";
-        overlay.style.height = height + "px";
-        overlay.style.display = "block";
-      },
-      hide() {
-        overlay.style.display = "none";
-      },
-    };
-  }
-  const overlay = createOverlay();
-  overlay.hide();
+  const overlay = new Overlay();
   let clickedElement: HTMLElement | null;
   setInterval(async () => {
     if (!(await sendToBackground("getEnable"))) {
@@ -47,29 +19,9 @@ import { getURLFromHTML } from "imagepetapeta-beta/src/renderer/utils/getURLFrom
   setInterval(() => {
     const clicledElementRect = clickedElement?.getBoundingClientRect();
     if (clicledElementRect !== undefined) {
-      overlay.show(
-        clicledElementRect.x,
-        clicledElementRect.y,
-        clicledElementRect.width,
-        clicledElementRect.height
-      );
+      overlay.show(clicledElementRect);
     }
-  }, 100);
-  function getURLFromStyle(style: CSSStyleDeclaration) {
-    const regexp = /url\(['"]?((?:\S*?\(\S*?\))*\S*?)['"]?\)/g;
-    return Array.from(
-      new Set([
-        ...[...style.backgroundImage.matchAll(regexp)].map((v) => v[1]),
-        ...[...style.background.matchAll(regexp)].map((v) => v[1]),
-      ])
-    );
-  }
-  function getURLsFromElement(element: HTMLElement) {
-    return [
-      getURLFromHTML(element.outerHTML),
-      ...getURLFromStyle(window.getComputedStyle(element)),
-    ];
-  }
+  }, 1000 / 30);
   window.addEventListener(
     "mousedown",
     async (event) => {
@@ -89,12 +41,7 @@ import { getURLFromHTML } from "imagepetapeta-beta/src/renderer/utils/getURLFrom
         return;
       }
       const clicledElementRect = clickedElement.getBoundingClientRect();
-      overlay.show(
-        clicledElementRect.x,
-        clicledElementRect.y,
-        clicledElementRect.width,
-        clicledElementRect.height
-      );
+      overlay.show(clicledElementRect);
       const allElements = Array.from(document.querySelectorAll("*")).filter(
         (element) => {
           if (element instanceof HTMLElement) {
