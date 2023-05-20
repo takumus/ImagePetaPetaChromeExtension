@@ -2,7 +2,7 @@ import { getURLFromHTML } from "imagepetapeta-beta/src/renderer/utils/getURLFrom
 
 export function getURLsFromElement(element: HTMLElement) {
   return [
-    getURLFromHTML(element.outerHTML),
+    ...(getURLFromHTML(element.outerHTML) ?? []),
     ...getURLFromStyle(window.getComputedStyle(element)),
   ];
 }
