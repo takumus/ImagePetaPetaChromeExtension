@@ -32,7 +32,6 @@ import { sendToBackground } from "@/sendToBackground";
       return;
     }
     clickedElement = elements.element;
-    console.log(elements);
     const elementAlt = elements.element.getAttribute("alt")?.trim();
     const pageTitle = document.title.trim();
     const name = (() => {
