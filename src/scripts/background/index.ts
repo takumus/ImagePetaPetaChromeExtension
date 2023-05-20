@@ -1,9 +1,11 @@
 import { Messages } from "@/backgroundMessages";
 import { sendToApp } from "@/commons/sendToApp";
+import { AppInfo } from "imagepetapeta-beta/src/commons/datas/appInfo";
 import {
   ImportFileAdditionalData,
   ImportFileGroup,
 } from "imagepetapeta-beta/src/commons/datas/importFileGroup";
+import { CHROME_EXTENSION_VERSION } from "imagepetapeta-beta/src/commons/defines";
 
 let order:
   | {
@@ -67,9 +69,9 @@ chrome.tabs.onUpdated.addListener((tabId) => {
   inject(tabId);
 });
 chrome.runtime.onMessage.addListener((request, _, response) => {
-  console.log(`type: ${request.type}, args:`, request.args);
+  // console.log(`type: ${request.type}, args:`, request.args);
   (messageFunctions as any)[request.type](...request.args).then((res: any) => {
-    console.log(`res:`, res);
+    // console.log(`res:`, res);
     response(res);
   });
   return true;
@@ -82,12 +84,18 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     const { urls, referrer, additionalData } = order;
     order = undefined;
     try {
-      await new Promise((res, rej) => {
-        sendToApp("getAppInfo")
-          .then(res)
-          .catch((error) => {});
+      const appInfo = await new Promise<AppInfo>((res, rej) => {
+        sendToApp("getAppInfo").then(res).catch(rej);
         setTimeout(rej, 1000);
       });
+      const version = appInfo.chromeExtensionVersion ?? 0;
+      if (version > CHROME_EXTENSION_VERSION) {
+        alert("拡張機能が古いです。\n拡張機能をアップデートしてください。");
+        return;
+      } else if (version < CHROME_EXTENSION_VERSION) {
+        alert("アプリが古いです。\nアプリをアップデートしてください。");
+        return;
+      }
     } catch {
       if (tab?.id) {
         await chrome.scripting.executeScript({
@@ -96,6 +104,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
             alert("ImagePetaPetaを起動してください。");
           },
         });
+        return;
       }
     }
     try {
