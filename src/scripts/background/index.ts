@@ -77,6 +77,10 @@ chrome.runtime.onMessage.addListener((request, _, response) => {
   return true;
 });
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+  const tabId = tab?.id;
+  if (tabId === undefined) {
+    return;
+  }
   if (info.menuItemId === "save") {
     if (order === undefined) {
       return;
@@ -90,22 +94,21 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
       });
       const version = appInfo.chromeExtensionVersion ?? 0;
       if (version > CHROME_EXTENSION_VERSION) {
-        alert("拡張機能が古いです。\n拡張機能をアップデートしてください。");
+        await _alert(
+          "拡張機能が古いです。\n拡張機能をアップデートしてください。",
+          tabId
+        );
         return;
       } else if (version < CHROME_EXTENSION_VERSION) {
-        alert("アプリが古いです。\nアプリをアップデートしてください。");
+        await _alert(
+          "アプリが古いです。\nアプリをアップデートしてください。",
+          tabId
+        );
         return;
       }
     } catch {
-      if (tab?.id) {
-        await chrome.scripting.executeScript({
-          target: { tabId: tab.id },
-          func: () => {
-            alert("ImagePetaPetaを起動してください。");
-          },
-        });
-        return;
-      }
+      await _alert("ImagePetaPetaを起動してください。", tabId);
+      return;
     }
     try {
       const result = await sendToApp("importFiles", [
@@ -127,7 +130,15 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     }
   }
 });
-
+async function _alert(message: string, tabId: number) {
+  await chrome.scripting.executeScript({
+    target: { tabId },
+    func: (message: string) => {
+      alert(message);
+    },
+    args: [message],
+  });
+}
 // chrome.runtime.onInstalled.addListener(() => {
 //   chrome.contextMenus.removeAll(() => {
 //     chrome.contextMenus.create({
