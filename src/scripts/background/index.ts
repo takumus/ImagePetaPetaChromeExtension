@@ -83,7 +83,9 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     order = undefined;
     try {
       await new Promise((res, rej) => {
-        sendToApp("getAppInfo").then(res);
+        sendToApp("getAppInfo")
+          .then(res)
+          .catch((error) => {});
         setTimeout(rej, 1000);
       });
     } catch {
