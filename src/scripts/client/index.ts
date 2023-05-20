@@ -6,10 +6,6 @@ import { Overlay } from "@/scripts/client/overlay";
 import { sendToBackground } from "@/sendToBackground";
 
 (async () => {
-  if ((window as any)["imagepetapeta-extension"] === true) {
-    return;
-  }
-  (window as any)["imagepetapeta-extension"] = true;
   const overlay = new Overlay();
   let clickedElement: HTMLElement | null;
   setInterval(async () => {

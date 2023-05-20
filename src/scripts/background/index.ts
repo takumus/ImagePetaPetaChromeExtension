@@ -39,6 +39,19 @@ const messageFunctions: Messages = {
 };
 async function inject(tabId: number) {
   try {
+    const [{ result }] = await chrome.scripting.executeScript({
+      target: { tabId },
+      func: async () => {
+        if ((window as any)["imagepetapeta-extension"] === true) {
+          return false;
+        }
+        (window as any)["imagepetapeta-extension"] = true;
+        return true;
+      },
+    });
+    if (!result) {
+      return;
+    }
     await chrome.scripting.executeScript({
       target: { tabId },
       files: ["./scripts/client.mjs"],
