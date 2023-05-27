@@ -1,15 +1,28 @@
 export class Overlay {
+  private shadowRoot: HTMLElement;
   private root: HTMLElement;
   private overlay: HTMLElement;
   public saveButton: HTMLDivElement;
   constructor() {
+    this.shadowRoot = document.createElement("div");
+    const shadowRoot = this.shadowRoot.attachShadow({ mode: "closed" });
+    const reset = document.createElement("style");
+    reset.innerHTML = `
+    .root {
+      all: initial;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    `;
+    shadowRoot.appendChild(reset);
     this.root = document.createElement("div");
     this.overlay = document.createElement("div");
     this.saveButton = document.createElement("div");
+    this.root.className = "root";
     setStyle(this.root, {
       position: "fixed",
       zIndex: "2147483647",
-      boxSizing: "border-box",
       pointerEvents: "none",
       fontFamily: `"Helvetica Neue",Helvetica,Arial,YuGothic,"Yu Gothic",游ゴシック体,游ゴシック,"ヒラギノ角ゴ ProN W3","Hiragino Kaku Gothic ProN","ヒラギノ角ゴ Pro W3","Hiragino Kaku Gothic Pro",メイリオ,Meiryo,"MS ゴシック","MS Gothic",sans-serif`,
     });
@@ -24,7 +37,7 @@ export class Overlay {
       margin: "0px",
       padding: "0px",
       boxShadow: `0px 0px 3px 3px rgba(0, 0, 0, 0.4), 0px 0px 3px 3px rgba(0, 0, 0, 0.4) inset`,
-      boxSizing: "border-box",
+      pointerEvents: "none",
     });
     setStyle(this.saveButton, {
       boxShadow: `0px 0px 3px 3px rgba(0, 0, 0, 0.4)`,
@@ -38,11 +51,11 @@ export class Overlay {
       fontWeight: "bold",
       backgroundColor: "#ffffff",
       transform: "translateX(-50%) translateY(-50%)",
-      boxSizing: "border-box",
       userSelect: "none",
       pointerEvents: "auto",
     });
-    document.body.appendChild(this.root);
+    document.body.appendChild(this.shadowRoot);
+    shadowRoot.appendChild(this.root);
     this.root.appendChild(this.saveButton);
     this.root.appendChild(this.overlay);
     this.hide();
