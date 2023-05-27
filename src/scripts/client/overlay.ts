@@ -1,54 +1,81 @@
 export class Overlay {
+  private root: HTMLElement;
   private overlay: HTMLElement;
   public saveButton: HTMLDivElement;
   constructor() {
+    this.root = document.createElement("div");
     this.overlay = document.createElement("div");
-    this.overlay.style.position = "fixed";
-    this.overlay.style.borderRadius = "6px";
-    this.overlay.style.border = `solid 5px #ffffff`;
-    this.overlay.style.zIndex = "2147483647";
-    this.overlay.style.margin = "0px";
-    this.overlay.style.padding = "0px";
-    this.overlay.style.pointerEvents = "none";
-    this.overlay.style.boxShadow = `
-    0px 0px 3px 3px rgba(0, 0, 0, 0.4),
-    0px 0px 3px 3px rgba(0, 0, 0, 0.4) inset
-    `;
-    this.overlay.style.boxSizing = "border-box";
     this.saveButton = document.createElement("div");
-    this.saveButton.style.position = "fixed";
-    this.saveButton.style.borderRadius = "6px";
-    this.saveButton.style.padding = "4px";
-    this.saveButton.style.backgroundColor = "#ffffff";
-    this.saveButton.style.zIndex = "2147483647";
-    this.saveButton.style.transform = "translateX(-50%) translateY(-50%)";
-    this.saveButton.style.boxSizing = "border-box";
-    this.saveButton.style.userSelect = "none";
-    document.body.appendChild(this.overlay);
-    document.body.appendChild(this.saveButton);
+    setStyle(this.root, {
+      position: "fixed",
+      zIndex: "2147483647",
+      boxSizing: "border-box",
+      pointerEvents: "none",
+      fontFamily: `"Helvetica Neue",Helvetica,Arial,YuGothic,"Yu Gothic",游ゴシック体,游ゴシック,"ヒラギノ角ゴ ProN W3","Hiragino Kaku Gothic ProN","ヒラギノ角ゴ Pro W3","Hiragino Kaku Gothic Pro",メイリオ,Meiryo,"MS ゴシック","MS Gothic",sans-serif`,
+    });
+    setStyle(this.overlay, {
+      position: "absolute",
+      top: "0px",
+      left: "0px",
+      width: "100%",
+      height: "100%",
+      borderRadius: "6px",
+      border: `solid 5px #ffffff`,
+      margin: "0px",
+      padding: "0px",
+      boxShadow: `0px 0px 3px 3px rgba(0, 0, 0, 0.4), 0px 0px 3px 3px rgba(0, 0, 0, 0.4) inset`,
+      boxSizing: "border-box",
+    });
+    setStyle(this.saveButton, {
+      boxShadow: `0px 0px 3px 3px rgba(0, 0, 0, 0.4)`,
+      position: "absolute",
+      top: "0px",
+      left: "0px",
+      borderRadius: "6px",
+      padding: "4px",
+      fontSize: "18px",
+      color: "#333333",
+      fontWeight: "bold",
+      backgroundColor: "#ffffff",
+      transform: "translateX(-50%) translateY(-50%)",
+      boxSizing: "border-box",
+      userSelect: "none",
+      pointerEvents: "auto",
+    });
+    document.body.appendChild(this.root);
+    this.root.appendChild(this.saveButton);
+    this.root.appendChild(this.overlay);
     this.hide();
   }
-  show(
-    rect: { x: number; y: number; width: number; height: number },
-    update: boolean
-  ) {
-    if (!update) {
-      this.saveButton.innerHTML = "Save";
-      this.saveButton.style.cursor = "pointer";
-      this.saveButton.style.display = this.overlay.style.display = "block";
-    }
-    this.overlay.style.left = rect.x + "px";
-    this.overlay.style.top = rect.y + "px";
-    this.overlay.style.width = rect.width + "px";
-    this.overlay.style.height = rect.height + "px";
-    this.saveButton.style.left = rect.x + rect.width / 2 + "px";
-    this.saveButton.style.top = rect.y + rect.height / 2 + "px";
+  show(rect: { x: number; y: number; width: number; height: number }) {
+    setStyle(this.root, {
+      display: "block",
+      left: rect.x + "px",
+      top: rect.y + "px",
+      width: rect.width + "px",
+      height: rect.height + "px",
+    });
+    setStyle(this.saveButton, {
+      left: rect.width / 2 + "px",
+      top: rect.height / 2 + "px",
+    });
   }
   hide() {
-    this.saveButton.style.display = this.overlay.style.display = "none";
+    this.root.style.display = "none";
   }
-  saved() {
-    this.saveButton.style.cursor = "unset";
-    this.saveButton.innerHTML = "Complete!";
+  setStatus(status: "ready" | "saving" | "saved") {
+    if (status === "ready") {
+      this.saveButton.innerHTML = "Save";
+      setStyle(this.saveButton, { cursor: "pointer" });
+    } else if (status === "saving") {
+      this.saveButton.innerHTML = "Saving...";
+      setStyle(this.saveButton, { cursor: "unset" });
+    } else if (status === "saved") {
+      this.saveButton.innerHTML = "Complete";
+      setStyle(this.saveButton, { cursor: "unset" });
+    }
   }
+}
+function setStyle(element: HTMLElement, styles: Partial<CSSStyleDeclaration>) {
+  Object.assign(element.style, styles);
 }

@@ -19,7 +19,7 @@ import { sendToBackground } from "@/sendToBackground";
   setInterval(() => {
     const clicledElementRect = clickedElement?.getBoundingClientRect();
     if (clicledElementRect !== undefined) {
-      overlay.show(clicledElementRect, true);
+      overlay.show(clicledElementRect);
     }
   }, 1000 / 30);
   async function select(x: number, y: number) {
@@ -30,11 +30,9 @@ import { sendToBackground } from "@/sendToBackground";
     if (elements === undefined) {
       return;
     }
+    overlay.setStatus("ready");
     clickedElement = elements.element;
     const clicledElementRect = clickedElement?.getBoundingClientRect();
-    if (clicledElementRect !== undefined) {
-      overlay.show(clicledElementRect, false);
-    }
     const elementAlt = elements.element.getAttribute("alt")?.trim();
     const pageTitle = document.title.trim();
     const name = (() => {
@@ -79,19 +77,20 @@ import { sendToBackground } from "@/sendToBackground";
     true
   );
   overlay.saveButton.addEventListener("click", async () => {
+    overlay.setStatus("saving");
     const result = await sendToBackground("save");
     if (result !== undefined) {
-      overlay.saved();
+      overlay.setStatus("saved");
     }
   });
   window.addEventListener(
     "mousedown",
-    async (event) => {
+    (event) => {
       if (!enabled) {
         return;
       }
-      event.preventDefault();
       if (event.target === overlay.saveButton) {
+        event.preventDefault();
         return;
       }
       if (event.button !== 2) {
@@ -99,6 +98,7 @@ import { sendToBackground } from "@/sendToBackground";
         clickedElement = null;
         return;
       }
+      event.preventDefault();
       select(event.clientX, event.clientY);
     },
     true
