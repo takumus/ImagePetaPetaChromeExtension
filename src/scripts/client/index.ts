@@ -8,8 +8,10 @@ import { sendToBackground } from "@/sendToBackground";
 (async () => {
   const overlay = new Overlay();
   let clickedElement: HTMLElement | null;
+  let enabled = false;
   setInterval(async () => {
-    if (!(await sendToBackground("getEnable"))) {
+    enabled = await sendToBackground("getEnable");
+    if (!enabled) {
       overlay.hide();
       clickedElement = null;
     }
@@ -21,9 +23,6 @@ import { sendToBackground } from "@/sendToBackground";
     }
   }, 1000 / 30);
   async function select(x: number, y: number) {
-    if (!(await sendToBackground("getEnable"))) {
-      return;
-    }
     const elements = getElementsOnPointer({
       x,
       y,
@@ -72,12 +71,14 @@ import { sendToBackground } from "@/sendToBackground";
   window.addEventListener(
     "contextmenu",
     (event) => {
+      if (!enabled) {
+        return;
+      }
       event.preventDefault();
     },
     true
   );
   overlay.saveButton.addEventListener("click", async () => {
-    console.log("save");
     const result = await sendToBackground("save");
     if (result !== undefined) {
       overlay.saved();
@@ -86,6 +87,9 @@ import { sendToBackground } from "@/sendToBackground";
   window.addEventListener(
     "mousedown",
     async (event) => {
+      if (!enabled) {
+        return;
+      }
       event.preventDefault();
       if (event.target === overlay.saveButton) {
         return;
