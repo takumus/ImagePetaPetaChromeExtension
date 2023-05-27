@@ -8,23 +8,27 @@ export class Overlay {
     const shadowRoot = this.shadowRoot.attachShadow({ mode: "closed" });
     shadowRoot.innerHTML = `
     <style>
-      .root {
-        all: initial !important;
-      }
       * {
-        box-sizing: border-box !important;
+        all: initial;
+        box-sizing: border-box;
+        font-family: "Helvetica Neue",Helvetica,Arial,YuGothic,"Yu Gothic",游ゴシック体,游ゴシック,"ヒラギノ角ゴ ProN W3","Hiragino Kaku Gothic ProN","ヒラギノ角ゴ Pro W3","Hiragino Kaku Gothic Pro",メイリオ,Meiryo,"MS ゴシック","MS Gothic",sans-serif;
+      }
+      .button {
+        background-color: #ffffff;
+      }
+      .button:hover {
+        background-color: #eeeeee;
       }
     </style>
     `;
     this.root = document.createElement("div");
     this.overlay = document.createElement("div");
     this.saveButton = document.createElement("div");
-    this.root.className = "root";
+    this.saveButton.className = "button";
     setStyle(this.root, {
       position: "fixed",
       zIndex: "2147483647",
       pointerEvents: "none",
-      fontFamily: `"Helvetica Neue",Helvetica,Arial,YuGothic,"Yu Gothic",游ゴシック体,游ゴシック,"ヒラギノ角ゴ ProN W3","Hiragino Kaku Gothic ProN","ヒラギノ角ゴ Pro W3","Hiragino Kaku Gothic Pro",メイリオ,Meiryo,"MS ゴシック","MS Gothic",sans-serif`,
     });
     setStyle(this.overlay, {
       position: "absolute",
@@ -32,32 +36,36 @@ export class Overlay {
       left: "0px",
       width: "100%",
       height: "100%",
-      borderRadius: "6px",
-      border: `solid 5px #ffffff`,
+      borderRadius: "8px",
+      border: `solid 4px #333333`,
+      backgroundColor: "rgba(255, 255, 255, 0.4)",
       margin: "0px",
       padding: "0px",
-      boxShadow: `0px 0px 3px 3px rgba(0, 0, 0, 0.4), 0px 0px 3px 3px rgba(0, 0, 0, 0.4) inset`,
+      boxShadow: `
+      0px 0px 0px 3px #ffffff,
+      0px 0px 0px 3px #ffffff inset,
+      0px 0px 4px 3px rgba(0, 0, 0, 0.4),
+      0px 0px 4px 3px rgba(0, 0, 0, 0.4) inset`,
       pointerEvents: "none",
     });
     setStyle(this.saveButton, {
-      boxShadow: `0px 0px 3px 3px rgba(0, 0, 0, 0.4)`,
+      boxShadow: `0px 0px 4px 0px rgba(0, 0, 0, 0.4)`,
       position: "absolute",
       top: "0px",
       left: "0px",
-      borderRadius: "6px",
+      borderRadius: "8px",
       padding: "4px",
       fontSize: "18px",
       color: "#333333",
       fontWeight: "bold",
-      backgroundColor: "#ffffff",
       transform: "translateX(-50%) translateY(-50%)",
       userSelect: "none",
       pointerEvents: "auto",
     });
     document.body.appendChild(this.shadowRoot);
     shadowRoot.appendChild(this.root);
-    this.root.appendChild(this.saveButton);
     this.root.appendChild(this.overlay);
+    this.root.appendChild(this.saveButton);
     this.hide();
   }
   show(rect: { x: number; y: number; width: number; height: number }) {
@@ -99,8 +107,7 @@ function setStyle(element: HTMLElement, styles: Partial<CSSStyleDeclaration>) {
         /[A-Z]+(?![a-z])|[A-Z]/g,
         (c, ofs) => (ofs ? "-" : "") + c.toLowerCase()
       ),
-      (styles as any)[key],
-      "important"
+      (styles as any)[key]
     );
   });
 }
