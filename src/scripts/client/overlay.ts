@@ -74,7 +74,7 @@ export class Overlay {
     });
   }
   hide() {
-    this.root.style.display = "none";
+    this.root.style.setProperty("display", "none", "important");
   }
   setStatus(status: "ready" | "saving" | "saved" | "failed") {
     if (status === "ready") {
