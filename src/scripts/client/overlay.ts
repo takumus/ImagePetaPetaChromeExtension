@@ -1,5 +1,5 @@
 export class Overlay {
-  private shadowRoot: HTMLElement;
+  public shadowRoot: HTMLElement;
   private root: HTMLElement;
   private overlay: HTMLElement;
   public saveButton: HTMLDivElement;

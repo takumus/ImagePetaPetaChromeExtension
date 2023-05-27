@@ -89,7 +89,7 @@ import { sendToBackground } from "@/sendToBackground";
       if (!enabled) {
         return;
       }
-      if (event.target === overlay.saveButton) {
+      if (event.target === overlay.shadowRoot) {
         event.preventDefault();
         return;
       }
