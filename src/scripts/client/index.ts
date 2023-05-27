@@ -17,7 +17,7 @@ import { sendToBackground } from "@/sendToBackground";
   setInterval(() => {
     const clicledElementRect = clickedElement?.getBoundingClientRect();
     if (clicledElementRect !== undefined) {
-      overlay.show(clicledElementRect);
+      overlay.show(clicledElementRect, true);
     }
   }, 1000 / 30);
   async function select(x: number, y: number) {
@@ -32,6 +32,10 @@ import { sendToBackground } from "@/sendToBackground";
       return;
     }
     clickedElement = elements.element;
+    const clicledElementRect = clickedElement?.getBoundingClientRect();
+    if (clicledElementRect !== undefined) {
+      overlay.show(clicledElementRect, false);
+    }
     const elementAlt = elements.element.getAttribute("alt")?.trim();
     const pageTitle = document.title.trim();
     const name = (() => {
@@ -66,8 +70,26 @@ import { sendToBackground } from "@/sendToBackground";
     });
   }
   window.addEventListener(
-    "mousedown",
+    "contextmenu",
     (event) => {
+      event.preventDefault();
+    },
+    true
+  );
+  overlay.saveButton.addEventListener("click", async () => {
+    console.log("save");
+    const result = await sendToBackground("save");
+    if (result !== undefined) {
+      overlay.saved();
+    }
+  });
+  window.addEventListener(
+    "mousedown",
+    async (event) => {
+      event.preventDefault();
+      if (event.target === overlay.saveButton) {
+        return;
+      }
       if (event.button !== 2) {
         overlay.hide();
         clickedElement = null;

@@ -25,15 +25,9 @@ const messageFunctions: Messages = {
   },
   async setEnable(value) {
     enabled = value;
-    chrome.contextMenus.removeAll(() => {
-      if (value) {
-        chrome.contextMenus.create({
-          id: "save",
-          title: "画像を保存",
-          contexts: ["all"],
-        });
-      }
-    });
+  },
+  async save() {
+    return await save();
   },
   async getEnable() {
     return enabled;
@@ -76,61 +70,59 @@ chrome.runtime.onMessage.addListener((request, _, response) => {
   });
   return true;
 });
-chrome.contextMenus.onClicked.addListener(async (info, tab) => {
-  const tabId = tab?.id;
+async function save(): Promise<string[] | undefined> {
+  if (order === undefined) {
+    return undefined;
+  }
+  const { urls, referrer, additionalData } = order;
+  order = undefined;
+  try {
+    const appInfo = await new Promise<AppInfo>((res, rej) => {
+      sendToApp("getAppInfo").then(res).catch(rej);
+      setTimeout(rej, 1000);
+    });
+    const version = appInfo.chromeExtensionVersion ?? 0;
+    if (version > CHROME_EXTENSION_VERSION) {
+      await _alert(
+        "拡張機能が古いです。\n拡張機能をアップデートしてください。"
+      );
+      return undefined;
+    } else if (version < CHROME_EXTENSION_VERSION) {
+      await _alert("アプリが古いです。\nアプリをアップデートしてください。");
+      return undefined;
+    }
+  } catch {
+    await _alert("ImagePetaPetaを起動してください。");
+    return undefined;
+  }
+  try {
+    const result = await sendToApp("importFiles", [
+      [
+        ...urls.map(
+          (url: string) =>
+            ({
+              type: "url",
+              referrer: referrer,
+              url,
+              additionalData,
+            } as ImportFileGroup[number])
+        ),
+      ],
+    ]);
+    console.log("imported:", result);
+    return [];
+  } catch {
+    //
+  }
+  return undefined;
+}
+async function _alert(message: string) {
+  const tabId = (
+    await chrome.tabs.query({ currentWindow: true, active: true })
+  )[0]?.id;
   if (tabId === undefined) {
     return;
   }
-  if (info.menuItemId === "save") {
-    if (order === undefined) {
-      return;
-    }
-    const { urls, referrer, additionalData } = order;
-    order = undefined;
-    try {
-      const appInfo = await new Promise<AppInfo>((res, rej) => {
-        sendToApp("getAppInfo").then(res).catch(rej);
-        setTimeout(rej, 1000);
-      });
-      const version = appInfo.chromeExtensionVersion ?? 0;
-      if (version > CHROME_EXTENSION_VERSION) {
-        await _alert(
-          "拡張機能が古いです。\n拡張機能をアップデートしてください。",
-          tabId
-        );
-        return;
-      } else if (version < CHROME_EXTENSION_VERSION) {
-        await _alert(
-          "アプリが古いです。\nアプリをアップデートしてください。",
-          tabId
-        );
-        return;
-      }
-    } catch {
-      await _alert("ImagePetaPetaを起動してください。", tabId);
-      return;
-    }
-    try {
-      const result = await sendToApp("importFiles", [
-        [
-          ...urls.map(
-            (url: string) =>
-              ({
-                type: "url",
-                referrer: referrer,
-                url,
-                additionalData,
-              } as ImportFileGroup[number])
-          ),
-        ],
-      ]);
-      console.log("imported:", result);
-    } catch {
-      //
-    }
-  }
-});
-async function _alert(message: string, tabId: number) {
   await chrome.scripting.executeScript({
     target: { tabId },
     func: (message: string) => {
@@ -139,12 +131,3 @@ async function _alert(message: string, tabId: number) {
     args: [message],
   });
 }
-// chrome.runtime.onInstalled.addListener(() => {
-//   chrome.contextMenus.removeAll(() => {
-//     chrome.contextMenus.create({
-//       id: "save",
-//       title: "画像を保存",
-//       contexts: ["all"],
-//     });
-//   });
-// });
