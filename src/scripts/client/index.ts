@@ -79,8 +79,10 @@ import { sendToBackground } from "@/sendToBackground";
   overlay.saveButton.addEventListener("click", async () => {
     overlay.setStatus("saving");
     const result = await sendToBackground("save");
-    if (result !== undefined) {
+    if (result) {
       overlay.setStatus("saved");
+    } else {
+      overlay.setStatus("failed");
     }
   });
   window.addEventListener(

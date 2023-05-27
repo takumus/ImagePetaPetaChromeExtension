@@ -66,7 +66,9 @@ chrome.runtime.onMessage.addListener((request, _, response) => {
   // console.log(`type: ${request.type}, args:`, request.args);
   (messageFunctions as any)[request.type](...request.args).then((res: any) => {
     // console.log(`res:`, res);
-    response(res);
+    response({
+      value: res,
+    });
   });
   return true;
 });
@@ -79,7 +81,7 @@ async function save(): Promise<string[] | undefined> {
   try {
     const appInfo = await new Promise<AppInfo>((res, rej) => {
       sendToApp("getAppInfo").then(res).catch(rej);
-      setTimeout(rej, 1000);
+      setTimeout(rej, 500);
     });
     const version = appInfo.chromeExtensionVersion ?? 0;
     if (version > CHROME_EXTENSION_VERSION) {
@@ -110,7 +112,7 @@ async function save(): Promise<string[] | undefined> {
       ],
     ]);
     console.log("imported:", result);
-    return [];
+    return result;
   } catch {
     //
   }

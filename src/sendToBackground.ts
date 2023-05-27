@@ -11,7 +11,9 @@ export function sendToBackground<U extends keyof Messages>(
           type,
           args,
         },
-        res
+        (data) => {
+          res(data.value);
+        }
       );
     } catch (err) {
       // rej(err);

@@ -6,16 +6,16 @@ export class Overlay {
   constructor() {
     this.shadowRoot = document.createElement("div");
     const shadowRoot = this.shadowRoot.attachShadow({ mode: "closed" });
-    const reset = document.createElement("style");
-    reset.innerHTML = `
-    .root {
-      all: initial;
-    }
-    * {
-      box-sizing: border-box;
-    }
+    shadowRoot.innerHTML = `
+    <style>
+      .root {
+        all: initial !important;
+      }
+      * {
+        box-sizing: border-box !important;
+      }
+    </style>
     `;
-    shadowRoot.appendChild(reset);
     this.root = document.createElement("div");
     this.overlay = document.createElement("div");
     this.saveButton = document.createElement("div");
@@ -76,7 +76,7 @@ export class Overlay {
   hide() {
     this.root.style.display = "none";
   }
-  setStatus(status: "ready" | "saving" | "saved") {
+  setStatus(status: "ready" | "saving" | "saved" | "failed") {
     if (status === "ready") {
       this.saveButton.innerHTML = "Save";
       setStyle(this.saveButton, { cursor: "pointer" });
@@ -86,9 +86,21 @@ export class Overlay {
     } else if (status === "saved") {
       this.saveButton.innerHTML = "Complete";
       setStyle(this.saveButton, { cursor: "unset" });
+    } else if (status === "failed") {
+      this.saveButton.innerHTML = "Failed";
+      setStyle(this.saveButton, { cursor: "unset" });
     }
   }
 }
 function setStyle(element: HTMLElement, styles: Partial<CSSStyleDeclaration>) {
-  Object.assign(element.style, styles);
+  Object.keys(styles).forEach((key) => {
+    element.style.setProperty(
+      key.replace(
+        /[A-Z]+(?![a-z])|[A-Z]/g,
+        (c, ofs) => (ofs ? "-" : "") + c.toLowerCase()
+      ),
+      (styles as any)[key],
+      "important"
+    );
+  });
 }
