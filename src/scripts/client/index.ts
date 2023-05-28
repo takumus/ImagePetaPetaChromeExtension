@@ -33,6 +33,7 @@ import { sendToBackground } from "@/sendToBackground";
     overlay.setStatus("ready");
     clickedElement = elements.element;
     const clicledElementRect = clickedElement?.getBoundingClientRect();
+    overlay.show(clicledElementRect, { x, y });
     const elementAlt = elements.element.getAttribute("alt")?.trim();
     const pageTitle = document.title.trim();
     const name = (() => {
@@ -85,13 +86,17 @@ import { sendToBackground } from "@/sendToBackground";
       overlay.setStatus("failed");
     }
   });
+  overlay.cancelButton.addEventListener("click", async () => {
+    overlay.hide();
+    clickedElement = null;
+  });
   window.addEventListener(
-    "mousedown",
+    "pointerdown",
     (event) => {
       if (!enabled) {
         return;
       }
-      if (event.target === overlay.shadowRoot) {
+      if (event.target === overlay.root) {
         event.preventDefault();
         return;
       }
