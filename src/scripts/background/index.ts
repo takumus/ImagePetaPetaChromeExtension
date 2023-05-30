@@ -1,5 +1,6 @@
-import { Messages } from "@/backgroundMessages";
+import { BackgroundMessages } from "@/backgroundMessages";
 import { sendToApp } from "@/commons/sendToApp";
+import { sendToContent } from "@/sendToContent";
 import { AppInfo } from "imagepetapeta-beta/src/commons/datas/appInfo";
 import {
   ImportFileAdditionalData,
@@ -15,7 +16,7 @@ let order:
     }
   | undefined;
 let enabled = false;
-const messageFunctions: Messages = {
+const messageFunctions: BackgroundMessages = {
   async orderSave(urls, referrer, additionalData) {
     order = {
       urls,
@@ -31,6 +32,73 @@ const messageFunctions: Messages = {
   },
   async getEnable() {
     return enabled;
+  },
+  async capture(rect) {
+    const tab = (
+      await chrome.tabs.query({ currentWindow: true, active: true })
+    )[0];
+    if (tab === undefined) {
+      return;
+    }
+    const image = await chrome.tabs.captureVisibleTab(tab.windowId, {
+      quality: 100,
+      format: "png",
+    });
+    if (rect !== undefined) {
+      const imageBitmap = await createImageBitmap(
+        await fetch(image).then((r) => r.blob())
+      );
+      rect.width = Math.max(Math.min(rect.width, 1), 0);
+      rect.height = Math.max(Math.min(rect.height, 1), 0);
+      rect.x = Math.max(Math.min(rect.x, 1), 0);
+      rect.y = Math.max(Math.min(rect.y, 1), 0);
+      console.log(rect);
+      const crop = {
+        width: Math.floor(rect.width * imageBitmap.width),
+        height: Math.floor(rect.height * imageBitmap.height),
+        x: Math.floor(rect.x * imageBitmap.width),
+        y: Math.floor(rect.y * imageBitmap.height),
+      };
+      const canvas = new OffscreenCanvas(crop.width, crop.height);
+      canvas.getContext("2d")?.drawImage(imageBitmap, -crop.x, -crop.y);
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const image = reader.result as string;
+        const result = await sendToApp("importFiles", [
+          [
+            ...[image].map(
+              (url: string) =>
+                ({
+                  type: "url",
+                  url,
+                  additionalData: {
+                    name: "cap",
+                    note: "capture",
+                  },
+                } as ImportFileGroup[number])
+            ),
+          ],
+        ]);
+      };
+      reader.readAsDataURL(await canvas.convertToBlob({ quality: 100 }));
+    } else {
+      const result = await sendToApp("importFiles", [
+        [
+          ...[image].map(
+            (url: string) =>
+              ({
+                type: "url",
+                url,
+                additionalData: {
+                  name: "cap",
+                  note: "capture",
+                },
+              } as ImportFileGroup[number])
+          ),
+        ],
+      ]);
+    }
+    return undefined;
   },
 };
 async function inject(tabId: number) {
@@ -133,3 +201,13 @@ async function _alert(message: string) {
     args: [message],
   });
 }
+chrome.commands.onCommand.addListener(async (command) => {
+  console.log(command);
+  const tabId = (
+    await chrome.tabs.query({ currentWindow: true, active: true })
+  )[0]?.id;
+  if (tabId === undefined) {
+    return;
+  }
+  sendToContent(tabId, "openMenu");
+});

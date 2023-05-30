@@ -6,6 +6,7 @@ export class Overlay {
   private menu: HTMLElement;
   private menuIcon: HTMLImageElement;
   public saveButton: HTMLDivElement;
+  public captureButton: HTMLDivElement;
   public cancelButton: HTMLDivElement;
   constructor() {
     this.root = document.createElement("div");
@@ -13,6 +14,7 @@ export class Overlay {
     this.overlay = document.createElement("div");
     this.menuIcon = document.createElement("img");
     this.saveButton = document.createElement("div");
+    this.captureButton = document.createElement("div");
     this.cancelButton = document.createElement("div");
     const shadowRoot = this.root.attachShadow({ mode: "closed" });
     const style = document.createElement("style");
@@ -77,10 +79,14 @@ export class Overlay {
       cursor: unset
     }
     `;
-    this.saveButton.className = this.cancelButton.className = "button";
+    this.saveButton.className =
+      this.cancelButton.className =
+      this.captureButton.className =
+        "button";
     this.menu.className = "menu";
     this.overlay.className = "overlay";
     this.cancelButton.innerHTML = "Cancel";
+    this.captureButton.innerHTML = "Capture";
     this.menuIcon.src = icon;
     setStyle(style, { display: "none" }, "important");
     document.body.appendChild(this.root);
@@ -90,6 +96,7 @@ export class Overlay {
     this.menu.appendChild(this.menuIcon);
     this.menu.appendChild(this.saveButton);
     this.menu.appendChild(this.cancelButton);
+    this.menu.appendChild(this.captureButton);
     this.hide();
   }
   show(
