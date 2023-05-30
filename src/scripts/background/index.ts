@@ -68,13 +68,13 @@ const messageFunctions: MessagesToBackground = {
     if (tab === undefined) {
       return;
     }
-    const fullImageDataURL = await chrome.tabs.captureVisibleTab(tab.windowId, {
+    let imageDataURL = await chrome.tabs.captureVisibleTab(tab.windowId, {
       quality: 100,
       format: "png",
     });
     if (rect !== undefined) {
       const imageBitmap = await createImageBitmap(
-        await fetch(fullImageDataURL).then((r) => r.blob())
+        await fetch(imageDataURL).then((r) => r.blob())
       );
       const x = Math.floor(rect.x * imageBitmap.width);
       const y = Math.floor(rect.y * imageBitmap.height);
@@ -82,7 +82,7 @@ const messageFunctions: MessagesToBackground = {
       const height = Math.floor(rect.height * imageBitmap.height);
       const canvas = new OffscreenCanvas(width, height);
       canvas.getContext("2d")?.drawImage(imageBitmap, -x, -y);
-      const croppedImageDataURL = await new Promise<string>((res) => {
+      imageDataURL = await new Promise<string>((res) => {
         const reader = new FileReader();
         reader.onload = async () => {
           res(reader.result as string);
@@ -91,32 +91,19 @@ const messageFunctions: MessagesToBackground = {
           .convertToBlob({ quality: 100 })
           .then(reader.readAsDataURL.bind(reader));
       });
-      return await sendToApp("importFiles", [
-        [
-          {
-            type: "url",
-            url: croppedImageDataURL,
-            additionalData: {
-              name: "capture",
-              note: url,
-            },
-          },
-        ] as ImportFileGroup,
-      ]);
-    } else {
-      return await sendToApp("importFiles", [
-        [
-          {
-            type: "url",
-            url: fullImageDataURL,
-            additionalData: {
-              name: "capture",
-              note: url,
-            },
-          },
-        ] as ImportFileGroup,
-      ]);
     }
+    return await sendToApp("importFiles", [
+      [
+        {
+          type: "url",
+          url: imageDataURL,
+          additionalData: {
+            name: "capture",
+            note: url,
+          },
+        },
+      ] as ImportFileGroup,
+    ]);
   },
 };
 async function inject(tabId: number) {
