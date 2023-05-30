@@ -8,7 +8,7 @@ export const manifest: chrome.runtime.Manifest = {
   manifest_version: 3,
   version: "1.0.0",
   description: "ImagePetaPeta",
-  permissions: ["tabs", "scripting", "contextMenus", "offscreen"],
+  permissions: ["tabs", "scripting", "contextMenus"],
   host_permissions: ["<all_urls>"],
   background: {
     service_worker: "scripts/background.mjs",

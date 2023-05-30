@@ -1,4 +1,2 @@
 node_modules
-dist/scripts
-dist/popup
-dist/manifest.json
+dist

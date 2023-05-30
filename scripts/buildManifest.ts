@@ -1,4 +1,4 @@
-import { manifest } from "./src/manifest";
+import { manifest } from "../src/manifest";
 import { writeFileSync } from "fs";
 import { resolve } from "path";
 

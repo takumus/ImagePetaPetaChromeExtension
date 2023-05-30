@@ -25,11 +25,16 @@
     "build": "run-s build:*",
     "build:scripts": "vite build --config vite.scripts.config.ts",
     "build:popup": "vite build --config vite.popup.config.ts",
-    "build:manifest": "tsx watch ./buildManifest.ts",
+    "build:manifest": "tsx ./scripts/buildManifest.ts",
     "dev": "run-p dev:*",
     "dev:scripts": "vite build --watch --config vite.scripts.config.ts",
     "dev:popup": "vite build --watch --config vite.popup.config.ts",
-    "dev:manifest": "tsx watch ./buildManifest.ts"
+    "dev:manifest": "tsx watch ./scripts/buildManifest.ts",
+    "generate": "run-p generate:*",
+    "generate:dir": "tsx ./scripts/generateDir.ts",
+    "generate:icon": "tsx ./scripts/buildIcon.ts",
+    "predev": "npm run generate",
+    "prebuild": "npm run generate"
   },
   "author": "",
   "volta": {
