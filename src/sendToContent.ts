@@ -1,10 +1,10 @@
-import { ContentMessages } from "@/contentMessages";
+import { MessagesToContent } from "@/messages";
 
-export function sendToContent<U extends keyof ContentMessages>(
+export function sendToContent<U extends keyof MessagesToContent>(
   tabId: number,
   type: U,
-  ...args: Parameters<ContentMessages[U]>
-): ReturnType<ContentMessages[U]> {
+  ...args: Parameters<MessagesToContent[U]>
+): ReturnType<MessagesToContent[U]> {
   return new Promise((res, rej) => {
     try {
       chrome.tabs.sendMessage(

@@ -1,9 +1,9 @@
-import { BackgroundMessages } from "@/backgroundMessages";
+import { MessagesToBackground } from "@/messages";
 
-export function sendToBackground<U extends keyof BackgroundMessages>(
+export function sendToBackground<U extends keyof MessagesToBackground>(
   type: U,
-  ...args: Parameters<BackgroundMessages[U]>
-): ReturnType<BackgroundMessages[U]> {
+  ...args: Parameters<MessagesToBackground[U]>
+): ReturnType<MessagesToBackground[U]> {
   return new Promise((res, rej) => {
     try {
       chrome.runtime.sendMessage(

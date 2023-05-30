@@ -1,5 +1,5 @@
 // import { icon } from "@/scripts/icon";
-import { ContentMessages } from "@/contentMessages";
+import { MessagesToContent } from "@/messages";
 import { getElementsOnPointer } from "@/scripts/client/getElementsOnPointer";
 import { getURLsFromElement } from "@/scripts/client/getURLsFromElement";
 import { Overlay } from "@/scripts/client/overlay";
@@ -86,17 +86,41 @@ import { throttle } from "throttle-debounce";
     await new Promise((res) => {
       setTimeout(res, 100);
     });
-    const result = await sendToBackground(
-      "capture",
-      domRect
-        ? {
-            width: domRect.width / window.innerWidth,
-            height: domRect.height / window.innerHeight,
-            x: domRect.x / window.innerWidth,
-            y: domRect.y / window.innerHeight,
-          }
-        : undefined
-    );
+    const rect = (() => {
+      if (domRect === undefined) {
+        return undefined;
+      }
+      const normalizedRect = {
+        width: domRect.width / window.innerWidth,
+        height: domRect.height / window.innerHeight,
+        x: domRect.x / window.innerWidth,
+        y: domRect.y / window.innerHeight,
+      };
+      const x = Math.max(Math.min(normalizedRect.x, 1), 0);
+      const y = Math.max(Math.min(normalizedRect.y, 1), 0);
+      const width = Math.max(
+        Math.min(
+          normalizedRect.width - (normalizedRect.x < 0 ? -normalizedRect.x : 0),
+          1 - x
+        ),
+        0
+      );
+      const height = Math.max(
+        Math.min(
+          normalizedRect.height -
+            (normalizedRect.y < 0 ? -normalizedRect.y : 0),
+          1 - y
+        ),
+        0
+      );
+      return {
+        x,
+        y,
+        width,
+        height,
+      };
+    })();
+    const result = await sendToBackground("capture", location.href, rect);
     if (result) {
       overlay.setStatus("saved");
     } else {
@@ -160,7 +184,7 @@ import { throttle } from "throttle-debounce";
     currentMousePosition.x = event.clientX;
     currentMousePosition.y = event.clientY;
   });
-  const messageFunctions: ContentMessages = {
+  const messageFunctions: MessagesToContent = {
     openMenu: async () => {
       if (!enabled) {
         return;

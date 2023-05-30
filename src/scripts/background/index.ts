@@ -1,12 +1,13 @@
-import { BackgroundMessages } from "@/backgroundMessages";
 import { sendToApp } from "@/commons/sendToApp";
+import { MessagesToBackground } from "@/messages";
+import { _alert } from "@/scripts/background/alert";
+import { checkApp } from "@/scripts/background/checkApp";
+import { getCurrentTab } from "@/scripts/background/getCurrentTab";
 import { sendToContent } from "@/sendToContent";
-import { AppInfo } from "imagepetapeta-beta/src/commons/datas/appInfo";
 import {
   ImportFileAdditionalData,
   ImportFileGroup,
 } from "imagepetapeta-beta/src/commons/datas/importFileGroup";
-import { CHROME_EXTENSION_VERSION } from "imagepetapeta-beta/src/commons/defines";
 
 let order:
   | {
@@ -16,7 +17,7 @@ let order:
     }
   | undefined;
 let enabled = false;
-const messageFunctions: BackgroundMessages = {
+const messageFunctions: MessagesToBackground = {
   async orderSave(urls, referrer, additionalData) {
     order = {
       urls,
@@ -28,77 +29,94 @@ const messageFunctions: BackgroundMessages = {
     enabled = value;
   },
   async save() {
-    return await save();
+    if (!(await checkApp())) {
+      return undefined;
+    }
+    if (order === undefined) {
+      return undefined;
+    }
+    const { urls, referrer, additionalData } = order;
+    order = undefined;
+    try {
+      const result = await sendToApp("importFiles", [
+        [
+          ...urls.map(
+            (url: string) =>
+              ({
+                type: "url",
+                referrer: referrer,
+                url,
+                additionalData,
+              } as ImportFileGroup[number])
+          ),
+        ],
+      ]);
+      return result;
+    } catch {
+      //
+    }
+    return undefined;
   },
   async getEnable() {
     return enabled;
   },
-  async capture(rect) {
-    const tab = (
-      await chrome.tabs.query({ currentWindow: true, active: true })
-    )[0];
+  async capture(url, rect) {
+    if (!(await checkApp())) {
+      return undefined;
+    }
+    const tab = await getCurrentTab();
     if (tab === undefined) {
       return;
     }
-    const image = await chrome.tabs.captureVisibleTab(tab.windowId, {
+    const fullImageDataURL = await chrome.tabs.captureVisibleTab(tab.windowId, {
       quality: 100,
       format: "png",
     });
     if (rect !== undefined) {
       const imageBitmap = await createImageBitmap(
-        await fetch(image).then((r) => r.blob())
+        await fetch(fullImageDataURL).then((r) => r.blob())
       );
-      rect.width = Math.max(Math.min(rect.width, 1), 0);
-      rect.height = Math.max(Math.min(rect.height, 1), 0);
-      rect.x = Math.max(Math.min(rect.x, 1), 0);
-      rect.y = Math.max(Math.min(rect.y, 1), 0);
-      console.log(rect);
-      const crop = {
-        width: Math.floor(rect.width * imageBitmap.width),
-        height: Math.floor(rect.height * imageBitmap.height),
-        x: Math.floor(rect.x * imageBitmap.width),
-        y: Math.floor(rect.y * imageBitmap.height),
-      };
-      const canvas = new OffscreenCanvas(crop.width, crop.height);
-      canvas.getContext("2d")?.drawImage(imageBitmap, -crop.x, -crop.y);
-      const reader = new FileReader();
-      reader.onload = async () => {
-        const image = reader.result as string;
-        const result = await sendToApp("importFiles", [
-          [
-            ...[image].map(
-              (url: string) =>
-                ({
-                  type: "url",
-                  url,
-                  additionalData: {
-                    name: "cap",
-                    note: "capture",
-                  },
-                } as ImportFileGroup[number])
-            ),
-          ],
-        ]);
-      };
-      reader.readAsDataURL(await canvas.convertToBlob({ quality: 100 }));
-    } else {
-      const result = await sendToApp("importFiles", [
+      const x = Math.floor(rect.x * imageBitmap.width);
+      const y = Math.floor(rect.y * imageBitmap.height);
+      const width = Math.floor(rect.width * imageBitmap.width);
+      const height = Math.floor(rect.height * imageBitmap.height);
+      const canvas = new OffscreenCanvas(width, height);
+      canvas.getContext("2d")?.drawImage(imageBitmap, -x, -y);
+      const croppedImageDataURL = await new Promise<string>((res) => {
+        const reader = new FileReader();
+        reader.onload = async () => {
+          res(reader.result as string);
+        };
+        canvas
+          .convertToBlob({ quality: 100 })
+          .then(reader.readAsDataURL.bind(reader));
+      });
+      return await sendToApp("importFiles", [
         [
-          ...[image].map(
-            (url: string) =>
-              ({
-                type: "url",
-                url,
-                additionalData: {
-                  name: "cap",
-                  note: "capture",
-                },
-              } as ImportFileGroup[number])
-          ),
-        ],
+          {
+            type: "url",
+            url: croppedImageDataURL,
+            additionalData: {
+              name: "capture",
+              note: url,
+            },
+          },
+        ] as ImportFileGroup,
+      ]);
+    } else {
+      return await sendToApp("importFiles", [
+        [
+          {
+            type: "url",
+            url: fullImageDataURL,
+            additionalData: {
+              name: "capture",
+              note: url,
+            },
+          },
+        ] as ImportFileGroup,
       ]);
     }
-    return undefined;
   },
 };
 async function inject(tabId: number) {
@@ -140,74 +158,14 @@ chrome.runtime.onMessage.addListener((request, _, response) => {
   });
   return true;
 });
-async function save(): Promise<string[] | undefined> {
-  if (order === undefined) {
-    return undefined;
-  }
-  const { urls, referrer, additionalData } = order;
-  order = undefined;
-  try {
-    const appInfo = await new Promise<AppInfo>((res, rej) => {
-      sendToApp("getAppInfo").then(res).catch(rej);
-      setTimeout(rej, 500);
-    });
-    const version = appInfo.chromeExtensionVersion ?? 0;
-    if (version > CHROME_EXTENSION_VERSION) {
-      await _alert(
-        "拡張機能が古いです。\n拡張機能をアップデートしてください。"
-      );
-      return undefined;
-    } else if (version < CHROME_EXTENSION_VERSION) {
-      await _alert("アプリが古いです。\nアプリをアップデートしてください。");
-      return undefined;
-    }
-  } catch {
-    await _alert("ImagePetaPetaを起動してください。");
-    return undefined;
-  }
-  try {
-    const result = await sendToApp("importFiles", [
-      [
-        ...urls.map(
-          (url: string) =>
-            ({
-              type: "url",
-              referrer: referrer,
-              url,
-              additionalData,
-            } as ImportFileGroup[number])
-        ),
-      ],
-    ]);
-    console.log("imported:", result);
-    return result;
-  } catch {
-    //
-  }
-  return undefined;
-}
-async function _alert(message: string) {
-  const tabId = (
-    await chrome.tabs.query({ currentWindow: true, active: true })
-  )[0]?.id;
-  if (tabId === undefined) {
-    return;
-  }
-  await chrome.scripting.executeScript({
-    target: { tabId },
-    func: (message: string) => {
-      alert(message);
-    },
-    args: [message],
-  });
-}
 chrome.commands.onCommand.addListener(async (command) => {
-  console.log(command);
-  const tabId = (
-    await chrome.tabs.query({ currentWindow: true, active: true })
-  )[0]?.id;
-  if (tabId === undefined) {
-    return;
+  switch (command) {
+    case "openMenu":
+      const tabId = (await getCurrentTab())?.id;
+      if (tabId === undefined) {
+        return;
+      }
+      sendToContent(tabId, "openMenu");
+      break;
   }
-  sendToContent(tabId, "openMenu");
 });

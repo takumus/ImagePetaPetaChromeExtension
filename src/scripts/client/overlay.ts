@@ -95,8 +95,8 @@ export class Overlay {
     shadowRoot.appendChild(this.menu);
     this.menu.appendChild(this.menuIcon);
     this.menu.appendChild(this.saveButton);
-    this.menu.appendChild(this.cancelButton);
     this.menu.appendChild(this.captureButton);
+    this.menu.appendChild(this.cancelButton);
     this.hide();
   }
   show(
