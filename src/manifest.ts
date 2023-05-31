@@ -1,5 +1,5 @@
 export const manifest: chrome.runtime.Manifest = {
-  name: "ImagePetaPetas",
+  name: "ImagePetaPeta",
   action: {
     default_title: "ImagePetaPeta",
     default_icon: "icon48.png",
