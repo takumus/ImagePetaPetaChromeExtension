@@ -16,8 +16,8 @@ export interface MessagesToBackground {
     }
   ) => Promise<string[] | undefined>;
   save: () => Promise<string[] | undefined>;
-  setEnable: (value: boolean) => Promise<void>;
-  getEnable: () => Promise<boolean>;
+  setRightClickEnable: (value: boolean) => Promise<void>;
+  getRightClickEnable: () => Promise<boolean>;
 }
 export interface MessagesToContent {
   openMenu: () => Promise<void>;

@@ -14,10 +14,10 @@ import { onMounted, ref, watch } from "vue";
 
 const enabled = ref(false);
 onMounted(async () => {
-  enabled.value = await sendToBackground("getEnable");
+  enabled.value = await sendToBackground("getRightClickEnable");
 });
 watch(enabled, (value) => {
-  sendToBackground("setEnable", value);
+  sendToBackground("setRightClickEnable", value);
 });
 </script>
 <style lang="scss">

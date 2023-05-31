@@ -17,15 +17,22 @@ let order:
     }
   | undefined;
 let enabled = false;
-const messageFunctions: MessagesToBackground = {
-  async orderSave(urls, referrer, additionalData) {
+type MessagesToBackgroundType = {
+  [P in keyof MessagesToBackground]: (
+    event: chrome.runtime.MessageSender,
+    ...args: Parameters<MessagesToBackground[P]>
+  ) => ReturnType<MessagesToBackground[P]>;
+};
+
+const messageFunctions: MessagesToBackgroundType = {
+  async orderSave(sender, urls, referrer, additionalData) {
     order = {
       urls,
       referrer,
       additionalData,
     };
   },
-  async setEnable(value) {
+  async setRightClickEnable(sender, value) {
     enabled = value;
   },
   async save() {
@@ -57,21 +64,23 @@ const messageFunctions: MessagesToBackground = {
     }
     return undefined;
   },
-  async getEnable() {
+  async getRightClickEnable() {
     return enabled;
   },
-  async capture(url, rect) {
+  async capture(sender, url, rect) {
     if (!(await checkApp())) {
       return undefined;
     }
-    const tab = await getCurrentTab();
-    if (tab === undefined) {
+    if (sender.tab === undefined) {
       return;
     }
-    let imageDataURL = await chrome.tabs.captureVisibleTab(tab.windowId, {
-      quality: 100,
-      format: "png",
-    });
+    let imageDataURL = await chrome.tabs.captureVisibleTab(
+      sender.tab.windowId,
+      {
+        quality: 100,
+        format: "png",
+      }
+    );
     if (rect !== undefined) {
       const imageBitmap = await createImageBitmap(
         await fetch(imageDataURL).then((r) => r.blob())
@@ -135,24 +144,24 @@ chrome.tabs.onActivated.addListener((info) => {
 chrome.tabs.onUpdated.addListener((tabId) => {
   inject(tabId);
 });
-chrome.runtime.onMessage.addListener((request, _, response) => {
-  // console.log(`type: ${request.type}, args:`, request.args);
-  (messageFunctions as any)[request.type](...request.args).then((res: any) => {
-    // console.log(`res:`, res);
-    response({
-      value: res,
+chrome.runtime.onMessage.addListener((request, sender, response) => {
+  // console.log(request, sender);
+  (messageFunctions as any)
+    [request.type](sender, ...request.args)
+    .then((res: any) => {
+      // console.log(`res:`, res);
+      response({
+        value: res,
+      });
     });
-  });
   return true;
 });
-chrome.commands.onCommand.addListener(async (command) => {
+chrome.commands.onCommand.addListener(async (command, tab) => {
   switch (command) {
     case "openMenu":
-      const tabId = (await getCurrentTab())?.id;
-      if (tabId === undefined) {
-        return;
+      if (tab.id !== undefined) {
+        sendToContent(tab.id, "openMenu");
       }
-      sendToContent(tabId, "openMenu");
       break;
   }
 });

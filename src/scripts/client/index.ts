@@ -4,24 +4,19 @@ import { getElementsOnPointer } from "@/scripts/client/getElementsOnPointer";
 import { getURLsFromElement } from "@/scripts/client/getURLsFromElement";
 import { Overlay } from "@/scripts/client/overlay";
 import { sendToBackground } from "@/sendToBackground";
-import { throttle } from "throttle-debounce";
 
 (async () => {
   const overlay = new Overlay();
   const currentMousePosition = { x: 0, y: 0 };
-  let clickedElement: HTMLElement | null;
-  let enabled = false;
+  let clickedElement: { element: HTMLElement; rect: DOMRect } | undefined;
+  let enabledRightClick = false;
   setInterval(async () => {
-    enabled = await sendToBackground("getEnable");
-    if (!enabled) {
-      overlay.hide();
-      clickedElement = null;
-    }
-  }, 1000);
+    enabledRightClick = await sendToBackground("getRightClickEnable");
+  }, 200);
   setInterval(() => {
-    const clicledElementRect = clickedElement?.getBoundingClientRect();
-    if (clicledElementRect !== undefined) {
-      overlay.show(clicledElementRect);
+    if (clickedElement !== undefined) {
+      clickedElement.rect = clickedElement.element.getBoundingClientRect();
+      overlay.show(clickedElement.rect);
     }
   }, 1000 / 30);
   async function select(x: number, y: number) {
@@ -33,9 +28,11 @@ import { throttle } from "throttle-debounce";
       return;
     }
     overlay.setStatus("ready");
-    clickedElement = elements.element;
-    const clicledElementRect = clickedElement?.getBoundingClientRect();
-    overlay.show(clicledElementRect, { x, y });
+    clickedElement = {
+      element: elements.element,
+      rect: elements.element.getBoundingClientRect(),
+    };
+    overlay.show(clickedElement.rect, { x, y });
     const elementAlt = elements.element.getAttribute("alt")?.trim();
     const pageTitle = document.title.trim();
     const name = (() => {
@@ -50,7 +47,7 @@ import { throttle } from "throttle-debounce";
     let urls: string[] = [];
     Array.from(
       new Set(
-        [clickedElement, ...elements.elements].map((element) => {
+        [clickedElement.element, ...elements.elements].map((element) => {
           return getURLsFromElement(element);
         })
       )
@@ -80,11 +77,11 @@ import { throttle } from "throttle-debounce";
   });
   overlay.captureButton.addEventListener("click", async () => {
     overlay.setStatus("saving");
-    const domRect = clickedElement?.getBoundingClientRect();
+    const domRect = clickedElement?.rect;
     overlay.hide();
-    clickedElement = null;
+    clickedElement = undefined;
     await new Promise((res) => {
-      setTimeout(res, 100);
+      requestAnimationFrame(res);
     });
     const rect = (() => {
       if (domRect === undefined) {
@@ -129,28 +126,12 @@ import { throttle } from "throttle-debounce";
   });
   overlay.cancelButton.addEventListener("click", async () => {
     overlay.hide();
-    clickedElement = null;
-  });
-  const click = throttle(100, (event: PointerEvent | MouseEvent) => {
-    if (!enabled) {
-      return;
-    }
-    if (event.target === overlay.root) {
-      event.preventDefault();
-      return;
-    }
-    if (event.button !== 2) {
-      overlay.hide();
-      clickedElement = null;
-      return;
-    }
-    event.preventDefault();
-    select(event.clientX, event.clientY);
+    clickedElement = undefined;
   });
   window.addEventListener(
     "contextmenu",
     (event) => {
-      if (!enabled) {
+      if (!enabledRightClick) {
         return;
       }
       event.preventDefault();
@@ -160,16 +141,13 @@ import { throttle } from "throttle-debounce";
   window.addEventListener(
     "pointerdown",
     (event) => {
-      if (!enabled) {
-        return;
-      }
       if (event.target === overlay.root) {
         event.preventDefault();
         return;
       }
-      if (event.button !== 2) {
+      if (!enabledRightClick || event.button !== 2) {
         overlay.hide();
-        clickedElement = null;
+        clickedElement = undefined;
         return;
       }
       event.preventDefault();
@@ -178,17 +156,11 @@ import { throttle } from "throttle-debounce";
     true
   );
   window.addEventListener("mousemove", (event) => {
-    if (!enabled) {
-      return;
-    }
     currentMousePosition.x = event.clientX;
     currentMousePosition.y = event.clientY;
   });
   const messageFunctions: MessagesToContent = {
     openMenu: async () => {
-      if (!enabled) {
-        return;
-      }
       select(currentMousePosition.x, currentMousePosition.y);
     },
   };
