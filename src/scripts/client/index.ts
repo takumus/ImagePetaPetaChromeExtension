@@ -36,10 +36,10 @@ import { sendToBackground } from "@/sendToBackground";
     const elementAlt = elements.element.getAttribute("alt")?.trim();
     const pageTitle = document.title.trim();
     const name = (() => {
-      if (elementAlt !== "") {
+      if (elementAlt !== undefined && elementAlt !== "") {
         return elementAlt;
       }
-      if (pageTitle !== "") {
+      if (pageTitle !== undefined && pageTitle !== "") {
         return pageTitle;
       }
       return "download";
@@ -81,7 +81,7 @@ import { sendToBackground } from "@/sendToBackground";
     overlay.hide();
     clickedElement = undefined;
     await new Promise((res) => {
-      requestAnimationFrame(res);
+      setTimeout(res, 1000 / 30);
     });
     const rect = (() => {
       if (domRect === undefined) {
