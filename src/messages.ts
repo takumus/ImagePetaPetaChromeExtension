@@ -4,6 +4,7 @@ export interface MessagesToBackground {
   orderSave: (
     urls: string[],
     referrer: string,
+    ua: string,
     additional?: ImportFileAdditionalData
   ) => Promise<void>;
   capture: (

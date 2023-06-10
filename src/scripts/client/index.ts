@@ -61,10 +61,16 @@ import { sendToBackground } from "@/sendToBackground";
     urls = Array.from(new Set(urls)).map(
       (url) => new URL(url, location.href).href
     );
-    await sendToBackground("orderSave", urls, window.location.origin, {
-      name,
-      note: location.href,
-    });
+    await sendToBackground(
+      "orderSave",
+      urls,
+      window.location.origin,
+      window.navigator.userAgent,
+      {
+        name,
+        note: location.href,
+      }
+    );
   }
   overlay.saveButton.addEventListener("click", async () => {
     overlay.setStatus("saving");

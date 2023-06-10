@@ -13,6 +13,7 @@ let order:
   | {
       urls: string[];
       referrer: string;
+      ua: string;
       additionalData?: ImportFileAdditionalData;
     }
   | undefined;
@@ -25,10 +26,11 @@ type MessagesToBackgroundType = {
 };
 
 const messageFunctions: MessagesToBackgroundType = {
-  async orderSave(sender, urls, referrer, additionalData) {
+  async orderSave(sender, urls, referrer, ua, additionalData) {
     order = {
       urls,
       referrer,
+      ua,
       additionalData,
     };
   },
@@ -42,7 +44,7 @@ const messageFunctions: MessagesToBackgroundType = {
     if (order === undefined) {
       return undefined;
     }
-    const { urls, referrer, additionalData } = order;
+    const { urls, referrer, additionalData, ua } = order;
     order = undefined;
     try {
       const result = await sendToApp("importFiles", [
@@ -53,6 +55,7 @@ const messageFunctions: MessagesToBackgroundType = {
                 type: "url",
                 referrer: referrer,
                 url,
+                ua,
                 additionalData,
               } as ImportFileGroup[number])
           ),
