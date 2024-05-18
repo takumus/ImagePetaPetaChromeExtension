@@ -1,5 +1,7 @@
 // import { icon } from "@/scripts/icon";
 import { MessagesToContent } from "@/messages";
+import { pinterest } from "@/scripts/client/drivers/pinterest";
+import { twitter } from "@/scripts/client/drivers/twitter";
 import { getElementsOnPointer } from "@/scripts/client/getElementsOnPointer";
 import { getURLsFromElement } from "@/scripts/client/getURLsFromElement";
 import { Overlay } from "@/scripts/client/overlay";
@@ -61,6 +63,8 @@ import { sendToBackground } from "@/sendToBackground";
     urls = Array.from(new Set(urls)).map(
       (url) => new URL(url, location.href).href
     );
+    urls = pinterest(urls);
+    urls = twitter(urls);
     await sendToBackground(
       "orderSave",
       urls,
