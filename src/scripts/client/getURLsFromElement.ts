@@ -7,7 +7,7 @@ export function getURLsFromElement(element: HTMLElement) {
   ];
 }
 function getURLFromStyle(style: CSSStyleDeclaration) {
-  const regexp = /url\(['"]?((?:\S*?\(\S*?\))*\S*?)['"]?\)/g;
+  const regexp = /url\(['"]?\s*([\s\S]*?)['"]?\s*\)/g;
   return Array.from(
     new Set([
       ...[...style.backgroundImage.matchAll(regexp)].map((v) => v[1]),
