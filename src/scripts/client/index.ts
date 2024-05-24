@@ -46,20 +46,14 @@ import { sendToBackground } from "@/sendToBackground";
       }
       return "download";
     })();
-    let urls: string[] = [];
-    Array.from(
-      new Set(
-        [clickedElement.element, ...elements.elements].map((element) => {
-          return getURLsFromElement(element);
-        })
-      )
-    ).forEach((u) => {
-      u.forEach((url) => {
-        if (url !== undefined) {
-          urls.push(url);
-        }
-      });
-    });
+    let urls: string[] = [clickedElement.element, ...elements.elements]
+      .map((element) => {
+        return getURLsFromElement(element);
+      })
+      .reduce<string[]>((p, c) => [...p, ...c], []);
+    console.log(urls);
+    urls = Array.from(new Set(urls));
+    console.log(urls);
     urls = Array.from(new Set(urls)).map(
       (url) => new URL(url, location.href).href
     );
