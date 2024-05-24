@@ -5,6 +5,7 @@ import { twitter } from "@/scripts/client/drivers/twitter";
 import { getElementsOnPointer } from "@/scripts/client/getElementsOnPointer";
 import { getURLsFromElement } from "@/scripts/client/getURLsFromElement";
 import { Overlay } from "@/scripts/client/overlay";
+import { Result } from "@/scripts/client/result";
 import { sendToBackground } from "@/sendToBackground";
 
 (async () => {
@@ -18,59 +19,54 @@ import { sendToBackground } from "@/sendToBackground";
   setInterval(() => {
     if (clickedElement !== undefined) {
       clickedElement.rect = clickedElement.element.getBoundingClientRect();
-      overlay.show(clickedElement.rect);
+      // overlay.show(clickedElement.rect);
     }
   }, 1000 / 30);
   async function select(x: number, y: number) {
-    const elements = getElementsOnPointer({
-      x,
-      y,
-    });
-    if (elements === undefined) {
-      return;
+    const _elements = Array.from(
+      document.querySelectorAll("*")
+    ) as HTMLElement[];
+    function getDepth(element: HTMLElement) {
+      let parent: HTMLElement | null = element.parentElement;
+      let depth = 0;
+      while (parent !== null) {
+        parent = parent?.parentElement;
+        depth++;
+      }
+      return depth;
     }
-    overlay.setStatus("ready");
-    clickedElement = {
-      element: elements.element,
-      rect: elements.element.getBoundingClientRect(),
-    };
-    overlay.show(clickedElement.rect, { x, y });
-    const elementAlt = elements.element.getAttribute("alt")?.trim();
-    const pageTitle = document.title.trim();
-    const name = (() => {
-      if (elementAlt !== undefined && elementAlt !== "") {
-        return elementAlt;
-      }
-      if (pageTitle !== undefined && pageTitle !== "") {
-        return pageTitle;
-      }
-      return "download";
-    })();
-    let urls: string[] = [clickedElement.element, ...elements.elements]
-      .map((element) => {
-        return getURLsFromElement(element);
+    const results: Result[] = _elements
+      .map((element) => ({
+        element,
+        rect: element.getBoundingClientRect(),
+        urls: getURLsFromElement(element),
+        depth: getDepth(element),
+      }))
+      .filter((res) => {
+        const rect = res.rect;
+        const isInRect =
+          rect.left < x && rect.right > x && rect.top < y && rect.bottom > y;
+        const hasURL = res.urls.length > 0;
+        return isInRect && hasURL;
       })
-      .reduce<string[]>((p, c) => [...p, ...c], []);
-    console.log(urls);
-    urls = Array.from(new Set(urls));
-    console.log(urls);
-    urls = Array.from(new Set(urls)).map(
-      (url) => new URL(url, location.href).href
-    );
+      .sort((a, b) => b.depth - a.depth);
+    overlay.show(results, { x, y });
+  }
+  overlay.onSave = async (url) => {
+    let urls = [url];
     urls = pinterest(urls);
     urls = twitter(urls);
+    console.log(urls);
     await sendToBackground(
       "orderSave",
       urls,
       window.location.origin,
       window.navigator.userAgent,
       {
-        name,
+        name: document.title,
         note: location.href,
       }
     );
-  }
-  overlay.saveButton.addEventListener("click", async () => {
     overlay.setStatus("saving");
     const result = await sendToBackground("save");
     if (result) {
@@ -78,7 +74,7 @@ import { sendToBackground } from "@/sendToBackground";
     } else {
       overlay.setStatus("failed");
     }
-  });
+  };
   overlay.captureButton.addEventListener("click", async () => {
     overlay.setStatus("saving");
     const domRect = clickedElement?.rect;
