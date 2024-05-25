@@ -15,7 +15,7 @@ export function sendToContent<U extends keyof MessagesToContent>(
         },
         (data) => {
           res(data.value);
-        }
+        },
       );
     } catch (err) {
       // rej(err);

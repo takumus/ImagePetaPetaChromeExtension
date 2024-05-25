@@ -1,7 +1,9 @@
-import { sendToApp } from "@/commons/sendToApp";
-import { _alert } from "@/scripts/background/alert";
 import { AppInfo } from "imagepetapeta-beta/src/commons/datas/appInfo";
 import { CHROME_EXTENSION_VERSION } from "imagepetapeta-beta/src/commons/defines";
+
+import { _alert } from "@/scripts/background/alert";
+
+import { sendToApp } from "@/commons/sendToApp";
 
 export async function checkApp() {
   try {
@@ -11,9 +13,7 @@ export async function checkApp() {
     });
     const version = appInfo.chromeExtensionVersion ?? 0;
     if (version > CHROME_EXTENSION_VERSION) {
-      await _alert(
-        "拡張機能が古いです。\n拡張機能をアップデートしてください。"
-      );
+      await _alert("拡張機能が古いです。\n拡張機能をアップデートしてください。");
       return false;
     } else if (version < CHROME_EXTENSION_VERSION) {
       await _alert("アプリが古いです。\nアプリをアップデートしてください。");

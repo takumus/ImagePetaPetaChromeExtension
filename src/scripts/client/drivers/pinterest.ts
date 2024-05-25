@@ -4,8 +4,5 @@ export function pinterest(urls: string[]) {
     return urls;
   }
   console.log("pinterest driver");
-  return [
-    url.replace(/i\.pinimg\.com\/.*\dx\//, "i.pinimg.com/originals/"),
-    ...urls,
-  ];
+  return [url.replace(/i\.pinimg\.com\/.*\dx\//, "i.pinimg.com/originals/"), ...urls];
 }

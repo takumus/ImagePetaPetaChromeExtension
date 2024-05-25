@@ -1,5 +1,6 @@
-import { APP_HOST } from "@/deines";
 import { IpcFunctions } from "imagepetapeta-beta/src/commons/ipc/ipcFunctions";
+
+import { APP_HOST } from "@/deines";
 
 export async function sendToApp<U extends keyof IpcFunctions>(
   event: U,

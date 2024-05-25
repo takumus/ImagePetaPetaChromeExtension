@@ -13,7 +13,7 @@ export function sendToBackground<U extends keyof MessagesToBackground>(
         },
         (data) => {
           res(data.value);
-        }
+        },
       );
     } catch (err) {
       // rej(err);

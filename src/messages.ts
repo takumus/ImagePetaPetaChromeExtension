@@ -5,7 +5,7 @@ export interface MessagesToBackground {
     urls: string[],
     referrer: string,
     ua: string,
-    additional?: ImportFileAdditionalData
+    additional?: ImportFileAdditionalData,
   ) => Promise<void>;
   capture: (
     url: string,
@@ -14,7 +14,7 @@ export interface MessagesToBackground {
       y: number;
       width: number;
       height: number;
-    }
+    },
   ) => Promise<string[] | undefined>;
   save: () => Promise<string[] | undefined>;
   setRightClickEnable: (value: boolean) => Promise<void>;

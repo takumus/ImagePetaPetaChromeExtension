@@ -1,13 +1,15 @@
-import { sendToApp } from "@/commons/sendToApp";
-import { MessagesToBackground } from "@/messages";
-import { _alert } from "@/scripts/background/alert";
-import { checkApp } from "@/scripts/background/checkApp";
-import { getCurrentTab } from "@/scripts/background/getCurrentTab";
-import { sendToContent } from "@/sendToContent";
 import {
   ImportFileAdditionalData,
   ImportFileGroup,
 } from "imagepetapeta-beta/src/commons/datas/importFileGroup";
+
+import { _alert } from "@/scripts/background/alert";
+import { checkApp } from "@/scripts/background/checkApp";
+import { getCurrentTab } from "@/scripts/background/getCurrentTab";
+
+import { sendToApp } from "@/commons/sendToApp";
+import { MessagesToBackground } from "@/messages";
+import { sendToContent } from "@/sendToContent";
 
 let order:
   | {
@@ -57,7 +59,7 @@ const messageFunctions: MessagesToBackgroundType = {
                 url,
                 ua,
                 additionalData,
-              } as ImportFileGroup[number])
+              }) as ImportFileGroup[number],
           ),
         ],
       ]);
@@ -77,17 +79,12 @@ const messageFunctions: MessagesToBackgroundType = {
     if (sender.tab === undefined) {
       return;
     }
-    let imageDataURL = await chrome.tabs.captureVisibleTab(
-      sender.tab.windowId,
-      {
-        quality: 100,
-        format: "png",
-      }
-    );
+    let imageDataURL = await chrome.tabs.captureVisibleTab(sender.tab.windowId, {
+      quality: 100,
+      format: "png",
+    });
     if (rect !== undefined) {
-      const imageBitmap = await createImageBitmap(
-        await fetch(imageDataURL).then((r) => r.blob())
-      );
+      const imageBitmap = await createImageBitmap(await fetch(imageDataURL).then((r) => r.blob()));
       const x = Math.floor(rect.x * imageBitmap.width);
       const y = Math.floor(rect.y * imageBitmap.height);
       const width = Math.floor(rect.width * imageBitmap.width);
@@ -99,9 +96,7 @@ const messageFunctions: MessagesToBackgroundType = {
         reader.onload = async () => {
           res(reader.result as string);
         };
-        canvas
-          .convertToBlob({ quality: 100 })
-          .then(reader.readAsDataURL.bind(reader));
+        canvas.convertToBlob({ quality: 100 }).then(reader.readAsDataURL.bind(reader));
       });
     }
     return await sendToApp("importFiles", [
@@ -149,14 +144,12 @@ chrome.tabs.onUpdated.addListener((tabId) => {
 });
 chrome.runtime.onMessage.addListener((request, sender, response) => {
   // console.log(request, sender);
-  (messageFunctions as any)
-    [request.type](sender, ...request.args)
-    .then((res: any) => {
-      // console.log(`res:`, res);
-      response({
-        value: res,
-      });
+  (messageFunctions as any)[request.type](sender, ...request.args).then((res: any) => {
+    // console.log(`res:`, res);
+    response({
+      value: res,
     });
+  });
   return true;
 });
 chrome.commands.onCommand.addListener(async (command, tab) => {
