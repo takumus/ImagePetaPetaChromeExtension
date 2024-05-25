@@ -9,23 +9,25 @@ export class UI {
   constructor() {
     document.body.append(this.uiElements.root);
     this.hide();
-    setInterval(() => {
-      this.boxAndResults.forEach((bar) => {
-        const rect = bar.result.element.getBoundingClientRect();
-        setStyle(bar.box, {
-          left: rect.x + "px",
-          top: rect.y + "px",
-          width: rect.width + "px",
-          height: rect.height + "px",
-        });
-      });
-    }, 1000 / 10); // 10fps
     new ResizeObserver((entries) => {
       const rect = entries[0]?.contentRect;
       if (rect) {
         this.updateMenuPosition(rect);
       }
     }).observe(this.uiElements.menu);
+    this.updateBoxPosition();
+  }
+  updateBoxPosition() {
+    this.boxAndResults.forEach((bar) => {
+      const rect = bar.result.element.getBoundingClientRect();
+      setStyle(bar.box, {
+        left: rect.x + "px",
+        top: rect.y + "px",
+        width: rect.width + "px",
+        height: rect.height + "px",
+      });
+    });
+    requestAnimationFrame(this.updateBoxPosition.bind(this));
   }
   updateMenuPosition(optionalRect?: DOMRect) {
     if (this.visible && this.position !== undefined) {
@@ -50,7 +52,15 @@ export class UI {
   }
   show(results: ImageParserResult[], mouse?: { x: number; y: number }) {
     this.position = mouse ? { ...mouse } : undefined;
-    this.reset();
+    if (
+      this.boxAndResults.map((bar) => bar.result.urls.join("\\")).join("\\") ===
+      results.map((r) => r.urls.join("\\")).join("\\")
+    ) {
+      this.updateMenuPosition();
+      return;
+    }
+    this.hide();
+    if (results.length === 0) return;
     this.visible = true;
     setStyle(this.uiElements.root, { display: "block" }, "important");
     this.uiElements.buttons.scrollTo(0, 0);

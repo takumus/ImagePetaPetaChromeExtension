@@ -164,3 +164,19 @@ chrome.commands.onCommand.addListener(async (command, tab) => {
       break;
   }
 });
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+  switch (info.menuItemId) {
+    case "saveImage":
+      if (tab?.id !== undefined) {
+        sendToContent(tab.id, "openMenu");
+      }
+      break;
+  }
+});
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.contextMenus.create({
+    id: "saveImage",
+    contexts: ["all"],
+    title: "Save Images",
+  });
+});
