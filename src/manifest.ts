@@ -28,5 +28,12 @@ export const manifest: chrome.runtime.Manifest = {
       },
       description: "Open Menu",
     },
+    reload: {
+      suggested_key: {
+        default: "Alt+R",
+        mac: "Shift+Command+R",
+      },
+      description: "Reload",
+    },
   },
 };

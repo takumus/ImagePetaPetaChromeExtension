@@ -159,5 +159,8 @@ chrome.commands.onCommand.addListener(async (command, tab) => {
         sendToContent(tab.id, "openMenu");
       }
       break;
+    case "reload":
+      chrome.runtime.reload();
+      break;
   }
 });
