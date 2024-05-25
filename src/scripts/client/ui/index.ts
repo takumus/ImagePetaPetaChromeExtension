@@ -2,47 +2,48 @@ import { ImageParserResult } from "@/scripts/client/imageParser";
 import injectHTMLString from "@/scripts/client/ui/uiTemplate.html?raw";
 
 // import { icon } from "@/scripts/icon";
-
+function template(element: HTMLElement) {
+  return () => element.cloneNode(true) as HTMLElement;
+}
+type Template = ReturnType<typeof template>;
 export class UI {
-  public root: HTMLElement;
-  private style: HTMLStyleElement;
+  public readonly root: HTMLElement;
   private menu: HTMLElement;
   private rects: HTMLElement;
-  public shadowRoot: ShadowRoot;
-  public buttons: HTMLElement;
-  public saveButtonTemplate: HTMLElement;
-  public rectTemplate: HTMLElement;
+  private buttons: HTMLElement;
+  private saveButtonTemplate: Template;
+  private rectTemplate: Template;
   constructor() {
     const injectHTML = new DOMParser().parseFromString(injectHTMLString, "text/html");
-    this.style = injectHTML.head.querySelector("style")!;
+    const style = injectHTML.head.querySelector("style")!;
     this.menu = injectHTML.body.querySelector("#menu")!;
-    this.buttons = injectHTML.body.querySelector("#buttons")!;
-    this.saveButtonTemplate = this.buttons.querySelector("#save-button")!;
+    this.buttons = injectHTML.body.querySelector("#menu > #buttons")!;
+    this.saveButtonTemplate = template(
+      this.buttons.querySelector("#menu > #buttons > #save-button")!,
+    );
     this.rects = injectHTML.body.querySelector("#rects")!;
-    this.rectTemplate = this.rects.querySelector("#rect")!;
+    this.rectTemplate = template(this.rects.querySelector("#rects > #rect")!);
     // remove templates
     injectHTML.querySelectorAll(".template").forEach((e) => e.remove());
     // init root
     this.root = document.createElement("div");
-    this.shadowRoot = this.root.attachShadow({ mode: "closed" });
-    this.shadowRoot.append(this.style, ...Array.from(injectHTML.body.children));
+    this.root
+      .attachShadow({ mode: "closed" })
+      .append(style, ...Array.from(injectHTML.body.children));
     document.body.append(this.root);
     this.hide();
   }
-  clone(element: HTMLElement) {
-    return element.cloneNode(true) as HTMLElement;
-  }
-  removeOverlays() {
+  reset() {
     this.rects.innerHTML = "";
     this.buttons.innerHTML = "";
   }
   show(results: ImageParserResult[], mouse?: { x: number; y: number }) {
-    this.removeOverlays();
+    this.reset();
     setStyle(this.root, { display: "block" }, "important");
     this.buttons.scrollTo(0, 0);
     const urls: string[] = [];
     results.forEach((result, i) => {
-      const rect = this.clone(this.rectTemplate);
+      const rect = this.rectTemplate();
       setStyle(rect, {
         left: result.rect.x + "px",
         top: result.rect.y + "px",
@@ -53,7 +54,7 @@ export class UI {
       urls.push(...result.urls);
     });
     Array.from(new Set(urls)).forEach((url) => {
-      const saveButton = this.clone(this.saveButtonTemplate);
+      const saveButton = this.saveButtonTemplate();
       const img = saveButton.querySelector("img")!;
       const size = saveButton.querySelector(".size")!;
       img.src = url;
@@ -73,10 +74,9 @@ export class UI {
         top: mouse.y + "px",
       });
     }
-    // console.log(results, urls);
   }
   hide() {
-    this.removeOverlays();
+    this.reset();
     setStyle(this.root, { display: "none" }, "important");
   }
   onSave(_url: string) {}

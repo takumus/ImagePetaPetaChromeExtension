@@ -10,13 +10,8 @@ import { sendToBackground } from "@/sendToBackground";
 (async () => {
   const ui = new UI();
   const currentMousePosition = { x: 0, y: 0 };
-  let enabledRightClick = false;
-  setInterval(async () => {
-    enabledRightClick = await sendToBackground("getRightClickEnable");
-  }, 200);
   async function select(x: number, y: number) {
-    const results = getData({ x, y });
-    ui.show(results, { x, y });
+    ui.show(getData({ x, y }), { x, y });
   }
   ui.onSave = async (url) => {
     let urls = [url];
@@ -85,23 +80,13 @@ import { sendToBackground } from "@/sendToBackground";
   //   }
   // });
   window.addEventListener(
-    "contextmenu",
-    (event) => {
-      if (!enabledRightClick) {
-        return;
-      }
-      event.preventDefault();
-    },
-    true,
-  );
-  window.addEventListener(
     "pointerdown",
     (event) => {
       if (event.target === ui.root) {
         event.preventDefault();
         return;
       }
-      if (!enabledRightClick || event.button !== 2) {
+      if (event.button !== 2) {
         ui.hide();
         return;
       }
