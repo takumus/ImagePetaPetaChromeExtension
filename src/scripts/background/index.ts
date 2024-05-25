@@ -114,6 +114,8 @@ const messageFunctions: MessagesToBackgroundType = {
   },
 };
 async function inject(tabId: number) {
+  const version = await getVersion();
+  console.log("INJECT:", version);
   try {
     const [{ result }] = await chrome.scripting.executeScript({
       target: { tabId },
@@ -122,6 +124,7 @@ async function inject(tabId: number) {
           return false;
         }
         (window as any)["imagepetapeta-extension"] = true;
+        (window as any)["imagepetapeta-extension-version"] = version;
         return true;
       },
     });
@@ -152,11 +155,32 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
   });
   return true;
 });
+async function getVersion() {
+  return ((await chrome.storage.local.get()).version ?? 0) as number;
+}
+async function getInjectedVersion(tabId: number) {
+  const [{ result }] = await chrome.scripting.executeScript({
+    target: { tabId },
+    func: () => {
+      return (window as any)["imagepetapeta-extension-version"];
+    },
+  });
+  return result;
+}
 chrome.commands.onCommand.addListener(async (command, tab) => {
   switch (command) {
     case "openMenu":
       if (tab.id !== undefined) {
         sendToContent(tab.id, "openMenu");
+      }
+      break;
+    case "reload":
+      const version = (await getVersion()) + 1;
+      await chrome.storage.local.set({ version });
+      if (tab.id) {
+        const injectedVersion = await getInjectedVersion(tab.id!);
+        console.log(version, injectedVersion);
+        // chrome.runtime.reload();
       }
       break;
   }

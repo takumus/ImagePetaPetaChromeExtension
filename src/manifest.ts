@@ -8,7 +8,7 @@ export const manifest: chrome.runtime.Manifest = {
   manifest_version: 3,
   version: "1.0.0",
   description: "ImagePetaPeta",
-  permissions: ["tabs", "scripting", "contextMenus"],
+  permissions: ["tabs", "scripting", "contextMenus", "storage"],
   host_permissions: ["<all_urls>"],
   background: {
     service_worker: "scripts/background.mjs",
@@ -27,6 +27,13 @@ export const manifest: chrome.runtime.Manifest = {
         mac: "Shift+Command+S",
       },
       description: "Open Menu",
+    },
+    reload: {
+      suggested_key: {
+        default: "Alt+R",
+        mac: "Shift+Command+R",
+      },
+      description: "Reload",
     },
   },
 };
