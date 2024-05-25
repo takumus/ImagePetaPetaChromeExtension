@@ -5,9 +5,7 @@ import sharp from "sharp";
   const sizes = [16, 32, 48, 128];
   for (let i = 0; i < sizes.length; i++) {
     const size = sizes[i];
-    await sharp(
-      "./node_modules/imagepetapeta-beta/resources/images/app/icon.png"
-    )
+    await sharp("./node_modules/imagepetapeta-beta/resources/images/app/icon.png")
       .resize(size)
       .toFile(resolve("./dist", `icon${size}.png`));
   }
