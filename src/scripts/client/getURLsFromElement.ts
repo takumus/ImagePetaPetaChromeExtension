@@ -1,5 +1,5 @@
 export function getURLsFromElement(element: HTMLElement) {
-  return [
+  const urls = [
     ...(() => {
       switch (element.tagName) {
         // case "a":
@@ -11,6 +11,11 @@ export function getURLsFromElement(element: HTMLElement) {
     })(),
     ...getURLFromStyle(window.getComputedStyle(element)),
   ];
+  const modifiedURLs = Array.from(new Set(urls)).map((url) => new URL(url, location.href).href);
+  if (urls.length > 0) {
+    console.log(urls, modifiedURLs);
+  }
+  return modifiedURLs;
 }
 function getURLFromStyle(style: CSSStyleDeclaration) {
   const regexp = /url\(['"]?\s*([\s\S]*?)['"]?\s*\)/g;
@@ -18,7 +23,7 @@ function getURLFromStyle(style: CSSStyleDeclaration) {
     new Set([
       ...[...style.backgroundImage.matchAll(regexp)].map((v) => v[1]),
       ...[...style.background.matchAll(regexp)].map((v) => v[1]),
-    ])
+    ]),
   );
 }
 function fromA(dom: HTMLElement) {
@@ -50,7 +55,7 @@ function fromImg(dom: HTMLElement) {
         }
         return prev;
       },
-      { size: 0, src: undefined as string | undefined }
+      { size: 0, src: undefined as string | undefined },
     );
   const src = dom.getAttribute("src");
   if (src === undefined && max?.src === undefined) {

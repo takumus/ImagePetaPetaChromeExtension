@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style type="text/css" id="style">
+      * {
+        all: initial;
+        box-sizing: border-box;
+        pointer-events: none;
+        font-family: "Helvetica Neue", Helvetica, Arial, YuGothic, "Yu Gothic", 游ゴシック体,
+          游ゴシック, "ヒラギノ角ゴ ProN W3", "Hiragino Kaku Gothic ProN", "ヒラギノ角ゴ Pro W3",
+          "Hiragino Kaku Gothic Pro", メイリオ, Meiryo, "MS ゴシック", "MS Gothic", sans-serif;
+        user-select: none;
+      }
+      script,
+      style,
+      head {
+        display: none;
+      }
+      *::-webkit-scrollbar {
+        width: 8px;
+      }
+      *::-webkit-scrollbar-thumb {
+        border-radius: 4px;
+        background-color: #999999;
+        min-height: 16px;
+      }
+      .rects > .rect {
+        position: fixed;
+        top: 0px;
+        left: 0px;
+        z-index: 2147483646;
+        margin: 0px;
+        box-shadow:
+          0px 0px 0px 2px #cccccc,
+          0px 0px 0px 2px #cccccc inset,
+          0px 0px 4px 3px rgba(0, 0, 0, 0.4),
+          0px 0px 4px 3px rgba(0, 0, 0, 0.4) inset;
+        border: solid 2px #333333;
+        border-radius: 8px;
+        padding: 0px;
+        width: 100%;
+        height: 100%;
+      }
+      .background {
+        position: fixed;
+        top: 0px;
+        left: 0px;
+        z-index: 2147483645;
+        background-color: rgba(0, 0, 0, 0.7);
+        width: 100%;
+        height: 100%;
+      }
+      .menu {
+        display: flex;
+        position: fixed;
+        flex-direction: column;
+        align-items: center;
+        transform: translateX(-50%) translateY(-50%);
+        z-index: 2147483647;
+        box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.4);
+        border-radius: 8px;
+        background-color: #ffffff;
+        padding: 8px;
+        min-width: 128px;
+        max-height: 50%;
+        pointer-events: auto;
+      }
+      .menu > .buttons {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        gap: 8px;
+        padding-right: 8px;
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
+      .menu > .buttons > .button {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 4px;
+        cursor: pointer;
+        border-radius: 4px;
+        padding: 8px;
+        pointer-events: auto;
+        color: #333333;
+        font-weight: bold;
+        font-size: 18px;
+      }
+      .menu > .buttons > .button:hover {
+        background-color: #dedede;
+      }
+      .menu > .buttons > .button.save > img {
+        display: block;
+        border-radius: 4px;
+        background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAADNJREFUOI1jvHz58n8GPEBHRwefNAMTXlkiwKgBg8EAxv///+NNB1euXKGtC0YNGAwGAAAfVwqTIQ+HUgAAAABJRU5ErkJggg==);
+        max-width: 300px;
+        height: 100%;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="menu" id="menu" style="left: 50%; top: 50%">
+      <div class="buttons" id="buttons">
+        <div class="template button save" id="save-button">
+          <div class="size">size</div>
+          <img
+            src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAADNJREFUOI1jvHz58n8GPEBHRwefNAMTXlkiwKgBg8EAxv///+NNB1euXKGtC0YNGAwGAAAfVwqTIQ+HUgAAAABJRU5ErkJggg==" />
+        </div>
+      </div>
+    </div>
+    <div class="rects" id="rects">
+      <div
+        class="template rect"
+        id="rect"
+        style="left: 10%; top: 10%; width: 20%; height: 20%"></div>
+    </div>
+    <div class="background" id="background"></div>
+  </body>
+</html>

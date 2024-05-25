@@ -1,11 +1,11 @@
 // import { icon } from "@/scripts/icon";
-import { MessagesToContent } from "@/messages";
 import { pinterest } from "@/scripts/client/drivers/pinterest";
 import { twitter } from "@/scripts/client/drivers/twitter";
-import { getElementsOnPointer } from "@/scripts/client/getElementsOnPointer";
 import { getURLsFromElement } from "@/scripts/client/getURLsFromElement";
 import { Overlay } from "@/scripts/client/overlay";
 import { Result } from "@/scripts/client/result";
+
+import { MessagesToContent } from "@/messages";
 import { sendToBackground } from "@/sendToBackground";
 
 (async () => {
@@ -19,13 +19,10 @@ import { sendToBackground } from "@/sendToBackground";
   setInterval(() => {
     if (clickedElement !== undefined) {
       clickedElement.rect = clickedElement.element.getBoundingClientRect();
-      // overlay.show(clickedElement.rect);
     }
   }, 1000 / 30);
   async function select(x: number, y: number) {
-    const _elements = Array.from(
-      document.querySelectorAll("*")
-    ) as HTMLElement[];
+    const _elements = Array.from(document.querySelectorAll("*")) as HTMLElement[];
     function getDepth(element: HTMLElement) {
       let parent: HTMLElement | null = element.parentElement;
       let depth = 0;
@@ -44,8 +41,7 @@ import { sendToBackground } from "@/sendToBackground";
       }))
       .filter((res) => {
         const rect = res.rect;
-        const isInRect =
-          rect.left < x && rect.right > x && rect.top < y && rect.bottom > y;
+        const isInRect = rect.left < x && rect.right > x && rect.top < y && rect.bottom > y;
         const hasURL = res.urls.length > 0;
         return isInRect && hasURL;
       })
@@ -57,16 +53,10 @@ import { sendToBackground } from "@/sendToBackground";
     urls = pinterest(urls);
     urls = twitter(urls);
     console.log(urls);
-    await sendToBackground(
-      "orderSave",
-      urls,
-      window.location.origin,
-      window.navigator.userAgent,
-      {
-        name: document.title,
-        note: location.href,
-      }
-    );
+    await sendToBackground("orderSave", urls, window.location.origin, window.navigator.userAgent, {
+      name: document.title,
+      note: location.href,
+    });
     overlay.setStatus("saving");
     const result = await sendToBackground("save");
     if (result) {
@@ -75,59 +65,55 @@ import { sendToBackground } from "@/sendToBackground";
       overlay.setStatus("failed");
     }
   };
-  overlay.captureButton.addEventListener("click", async () => {
-    overlay.setStatus("saving");
-    const domRect = clickedElement?.rect;
-    overlay.hide();
-    clickedElement = undefined;
-    await new Promise((res) => {
-      setTimeout(res, 1000 / 30);
-    });
-    const rect = (() => {
-      if (domRect === undefined) {
-        return undefined;
-      }
-      const normalizedRect = {
-        width: domRect.width / window.innerWidth,
-        height: domRect.height / window.innerHeight,
-        x: domRect.x / window.innerWidth,
-        y: domRect.y / window.innerHeight,
-      };
-      const x = Math.max(Math.min(normalizedRect.x, 1), 0);
-      const y = Math.max(Math.min(normalizedRect.y, 1), 0);
-      const width = Math.max(
-        Math.min(
-          normalizedRect.width - (normalizedRect.x < 0 ? -normalizedRect.x : 0),
-          1 - x
-        ),
-        0
-      );
-      const height = Math.max(
-        Math.min(
-          normalizedRect.height -
-            (normalizedRect.y < 0 ? -normalizedRect.y : 0),
-          1 - y
-        ),
-        0
-      );
-      return {
-        x,
-        y,
-        width,
-        height,
-      };
-    })();
-    const result = await sendToBackground("capture", location.href, rect);
-    if (result) {
-      overlay.setStatus("saved");
-    } else {
-      overlay.setStatus("failed");
-    }
-  });
-  overlay.cancelButton.addEventListener("click", async () => {
-    overlay.hide();
-    clickedElement = undefined;
-  });
+  // overlay.captureButton.addEventListener("click", async () => {
+  //   overlay.setStatus("saving");
+  //   const domRect = clickedElement?.rect;
+  //   overlay.hide();
+  //   clickedElement = undefined;
+  //   await new Promise((res) => {
+  //     setTimeout(res, 1000 / 30);
+  //   });
+  //   const rect = (() => {
+  //     if (domRect === undefined) {
+  //       return undefined;
+  //     }
+  //     const normalizedRect = {
+  //       width: domRect.width / window.innerWidth,
+  //       height: domRect.height / window.innerHeight,
+  //       x: domRect.x / window.innerWidth,
+  //       y: domRect.y / window.innerHeight,
+  //     };
+  //     const x = Math.max(Math.min(normalizedRect.x, 1), 0);
+  //     const y = Math.max(Math.min(normalizedRect.y, 1), 0);
+  //     const width = Math.max(
+  //       Math.min(
+  //         normalizedRect.width - (normalizedRect.x < 0 ? -normalizedRect.x : 0),
+  //         1 - x
+  //       ),
+  //       0
+  //     );
+  //     const height = Math.max(
+  //       Math.min(
+  //         normalizedRect.height -
+  //           (normalizedRect.y < 0 ? -normalizedRect.y : 0),
+  //         1 - y
+  //       ),
+  //       0
+  //     );
+  //     return {
+  //       x,
+  //       y,
+  //       width,
+  //       height,
+  //     };
+  //   })();
+  //   const result = await sendToBackground("capture", location.href, rect);
+  //   if (result) {
+  //     overlay.setStatus("saved");
+  //   } else {
+  //     overlay.setStatus("failed");
+  //   }
+  // });
   window.addEventListener(
     "contextmenu",
     (event) => {
@@ -136,7 +122,7 @@ import { sendToBackground } from "@/sendToBackground";
       }
       event.preventDefault();
     },
-    true
+    true,
   );
   window.addEventListener(
     "pointerdown",
@@ -153,7 +139,7 @@ import { sendToBackground } from "@/sendToBackground";
       event.preventDefault();
       select(event.clientX, event.clientY);
     },
-    true
+    true,
   );
   window.addEventListener("mousemove", (event) => {
     currentMousePosition.x = event.clientX;
@@ -165,13 +151,11 @@ import { sendToBackground } from "@/sendToBackground";
     },
   };
   chrome.runtime.onMessage.addListener((request, _, response) => {
-    (messageFunctions as any)
-      [request.type](...request.args)
-      .then((res: any) => {
-        response({
-          value: res,
-        });
+    (messageFunctions as any)[request.type](...request.args).then((res: any) => {
+      response({
+        value: res,
       });
+    });
     return true;
   });
 })();
