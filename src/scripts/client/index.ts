@@ -84,7 +84,7 @@ import { sendToBackground } from "@/sendToBackground";
   window.addEventListener(
     "pointerdown",
     (event) => {
-      if (event.target === ui.root) {
+      if (event.target === ui.uiElements.root) {
         event.preventDefault();
         return;
       }
@@ -92,8 +92,6 @@ import { sendToBackground } from "@/sendToBackground";
         ui.hide();
         return;
       }
-      event.preventDefault();
-      select(event.clientX, event.clientY);
     },
     true,
   );
