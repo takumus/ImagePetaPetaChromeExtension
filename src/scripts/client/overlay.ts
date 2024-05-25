@@ -5,23 +5,21 @@ import { Result } from "@/scripts/client/result";
 
 export class Overlay {
   public root: HTMLElement;
-  private rectElements: HTMLElement[] = [];
   private style: HTMLStyleElement;
   private menu: HTMLElement;
   private rects: HTMLElement;
-  public saveButtons: HTMLElement[] = [];
   public shadowRoot: ShadowRoot;
   public buttons: HTMLElement;
-  public saveButtonBase: HTMLElement;
-  public rectBase: HTMLElement;
+  public saveButtonTemplate: HTMLElement;
+  public rectTemplate: HTMLElement;
   constructor() {
     const injectHTML = new DOMParser().parseFromString(injectHTMLString, "text/html");
     this.style = injectHTML.head.querySelector("style")!;
     this.menu = injectHTML.body.querySelector("#menu")!;
     this.buttons = injectHTML.body.querySelector("#buttons")!;
-    this.saveButtonBase = this.buttons.querySelector("#save-button")!;
+    this.saveButtonTemplate = this.buttons.querySelector("#save-button")!;
     this.rects = injectHTML.body.querySelector("#rects")!;
-    this.rectBase = this.rects.querySelector("#rect")!;
+    this.rectTemplate = this.rects.querySelector("#rect")!;
     // remove templates
     injectHTML.querySelectorAll(".template").forEach((e) => e.remove());
     // init root
@@ -35,12 +33,8 @@ export class Overlay {
     return element.cloneNode(true) as HTMLElement;
   }
   removeOverlays() {
-    this.rectElements.forEach((overlay) => {
-      overlay.remove();
-    });
-    this.saveButtons.forEach((b) => {
-      b.remove();
-    });
+    this.rects.innerHTML = "";
+    this.buttons.innerHTML = "";
   }
   show(results: Result[], mouse?: { x: number; y: number }) {
     this.removeOverlays();
@@ -48,19 +42,18 @@ export class Overlay {
     this.buttons.scrollTo(0, 0);
     const urls: string[] = [];
     results.forEach((result, i) => {
-      const rect = this.clone(this.rectBase);
+      const rect = this.clone(this.rectTemplate);
       setStyle(rect, {
         left: result.rect.x + "px",
         top: result.rect.y + "px",
         width: result.rect.width + "px",
         height: result.rect.height + "px",
       });
-      this.rectElements.push(rect);
-      this.rects.appendChild(rect);
+      this.rects.append(rect);
       urls.push(...result.urls);
     });
     Array.from(new Set(urls)).forEach((url) => {
-      const saveButton = this.clone(this.saveButtonBase);
+      const saveButton = this.clone(this.saveButtonTemplate);
       const img = saveButton.querySelector("img")!;
       const size = saveButton.querySelector(".size")!;
       img.src = url;
@@ -72,7 +65,6 @@ export class Overlay {
       saveButton.addEventListener("click", () => {
         this.onSave(url);
       });
-      this.saveButtons.push(saveButton);
       this.buttons.append(saveButton);
     });
     if (mouse !== undefined) {
@@ -81,12 +73,13 @@ export class Overlay {
         top: mouse.y + "px",
       });
     }
+    // console.log(results, urls);
   }
   hide() {
     this.removeOverlays();
     setStyle(this.root, { display: "none" }, "important");
   }
-  onSave(url: string) {}
+  onSave(_url: string) {}
   setStatus(status: "ready" | "saving" | "saved" | "failed") {
     // if (status === "ready") {
     //   this.saveButton.innerHTML = "Save";

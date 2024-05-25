@@ -12,9 +12,6 @@ export function getURLsFromElement(element: HTMLElement) {
     ...getURLFromStyle(window.getComputedStyle(element)),
   ];
   const modifiedURLs = Array.from(new Set(urls)).map((url) => new URL(url, location.href).href);
-  if (urls.length > 0) {
-    console.log(urls, modifiedURLs);
-  }
   return modifiedURLs;
 }
 function getURLFromStyle(style: CSSStyleDeclaration) {
