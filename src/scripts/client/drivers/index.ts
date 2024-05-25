@@ -1,4 +1,3 @@
-// import { icon } from "@/scripts/icon";
 import { pinterest } from "@/scripts/client/drivers/pinterest";
 import { twitter } from "@/scripts/client/drivers/twitter";
 
