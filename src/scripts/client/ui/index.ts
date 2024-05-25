@@ -9,10 +9,13 @@ type Template = ReturnType<typeof template>;
 export class UI {
   public readonly root: HTMLElement;
   private menu: HTMLElement;
-  private rects: HTMLElement;
+  private boxes: HTMLElement;
   private buttons: HTMLElement;
   private saveButtonTemplate: Template;
-  private rectTemplate: Template;
+  private boxTemplate: Template;
+  private visible = false;
+  private position?: { x: number; y: number };
+  private boxAndResults: { box: HTMLElement; result: ImageParserResult }[] = [];
   constructor() {
     const injectHTML = new DOMParser().parseFromString(injectHTMLString, "text/html");
     const style = injectHTML.head.querySelector("style")!;
@@ -21,8 +24,8 @@ export class UI {
     this.saveButtonTemplate = template(
       this.buttons.querySelector("#menu > #buttons > #save-button")!,
     );
-    this.rects = injectHTML.body.querySelector("#rects")!;
-    this.rectTemplate = template(this.rects.querySelector("#rects > #rect")!);
+    this.boxes = injectHTML.body.querySelector("#boxes")!;
+    this.boxTemplate = template(this.boxes.querySelector("#boxes > #box")!);
     // remove templates
     injectHTML.querySelectorAll(".template").forEach((e) => e.remove());
     // init root
@@ -32,25 +35,62 @@ export class UI {
       .append(style, ...Array.from(injectHTML.body.children));
     document.body.append(this.root);
     this.hide();
+    setInterval(() => {
+      this.boxAndResults.forEach((bar) => {
+        const rect = bar.result.element.getBoundingClientRect();
+        setStyle(bar.box, {
+          left: rect.x + "px",
+          top: rect.y + "px",
+          width: rect.width + "px",
+          height: rect.height + "px",
+        });
+      });
+    }, 1000 / 10); // 10fps
+    new ResizeObserver((entries) => {
+      const rect = entries[0]?.contentRect;
+      if (rect) {
+        this.updateMenuPosition(rect);
+      }
+    }).observe(this.menu);
+  }
+  updateMenuPosition(optionalRect?: DOMRect) {
+    if (this.visible && this.position !== undefined) {
+      const rect = optionalRect ?? this.menu.getBoundingClientRect();
+      let { x, y } = this.position;
+      if (window.innerWidth < rect.width + this.position.x) {
+        x = this.position.x - rect.width;
+      }
+      if (window.innerHeight < rect.height + this.position.y) {
+        y = this.position.y - rect.height;
+      }
+      setStyle(this.menu, {
+        left: x + "px",
+        top: y + "px",
+      });
+    }
   }
   reset() {
-    this.rects.innerHTML = "";
+    this.boxes.innerHTML = "";
     this.buttons.innerHTML = "";
+    this.boxAndResults = [];
   }
   show(results: ImageParserResult[], mouse?: { x: number; y: number }) {
+    this.position = mouse ? { ...mouse } : undefined;
     this.reset();
+    this.visible = true;
     setStyle(this.root, { display: "block" }, "important");
     this.buttons.scrollTo(0, 0);
     const urls: string[] = [];
     results.forEach((result, i) => {
-      const rect = this.rectTemplate();
-      setStyle(rect, {
+      const box = this.boxTemplate();
+      setStyle(box, {
         left: result.rect.x + "px",
         top: result.rect.y + "px",
         width: result.rect.width + "px",
         height: result.rect.height + "px",
       });
-      this.rects.append(rect);
+      this.boxes.append(box);
+      this.boxAndResults.push({ box: box, result });
       urls.push(...result.urls);
     });
     Array.from(new Set(urls)).forEach((url) => {
@@ -68,14 +108,10 @@ export class UI {
       });
       this.buttons.append(saveButton);
     });
-    if (mouse !== undefined) {
-      setStyle(this.menu, {
-        left: mouse.x + "px",
-        top: mouse.y + "px",
-      });
-    }
+    this.updateMenuPosition();
   }
   hide() {
+    this.visible = false;
     this.reset();
     setStyle(this.root, { display: "none" }, "important");
   }

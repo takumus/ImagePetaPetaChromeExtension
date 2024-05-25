@@ -27,7 +27,7 @@
         background-color: #999999;
         min-height: 16px;
       }
-      .rects > .rect {
+      .boxes > .box {
         position: fixed;
         top: 0px;
         left: 0px;
@@ -58,7 +58,6 @@
         position: fixed;
         flex-direction: column;
         align-items: center;
-        transform: translateX(-50%) translateY(-50%);
         z-index: 2147483647;
         box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.4);
         border-radius: 8px;
@@ -115,11 +114,8 @@
         </div>
       </div>
     </div>
-    <div class="rects" id="rects">
-      <div
-        class="template rect"
-        id="rect"
-        style="left: 10%; top: 10%; width: 20%; height: 20%"></div>
+    <div class="boxes" id="boxes">
+      <div class="template box" id="box" style="left: 10%; top: 10%; width: 20%; height: 20%"></div>
     </div>
     <div class="background" id="background"></div>
   </body>
