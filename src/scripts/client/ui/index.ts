@@ -1,9 +1,9 @@
-import injectHTMLString from "@/scripts/client/inject.html?raw";
-import { Result } from "@/scripts/client/result";
+import { ImageParserResult } from "@/scripts/client/imageParser";
+import injectHTMLString from "@/scripts/client/ui/uiTemplate.html?raw";
 
 // import { icon } from "@/scripts/icon";
 
-export class Overlay {
+export class UI {
   public root: HTMLElement;
   private style: HTMLStyleElement;
   private menu: HTMLElement;
@@ -36,7 +36,7 @@ export class Overlay {
     this.rects.innerHTML = "";
     this.buttons.innerHTML = "";
   }
-  show(results: Result[], mouse?: { x: number; y: number }) {
+  show(results: ImageParserResult[], mouse?: { x: number; y: number }) {
     this.removeOverlays();
     setStyle(this.root, { display: "block" }, "important");
     this.buttons.scrollTo(0, 0);

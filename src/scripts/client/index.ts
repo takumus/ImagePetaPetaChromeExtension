@@ -1,54 +1,24 @@
 // import { icon } from "@/scripts/icon";
 import { pinterest } from "@/scripts/client/drivers/pinterest";
 import { twitter } from "@/scripts/client/drivers/twitter";
-import { getURLsFromElement } from "@/scripts/client/getURLsFromElement";
-import { Overlay } from "@/scripts/client/overlay";
-import { Result } from "@/scripts/client/result";
+import { getData } from "@/scripts/client/imageParser";
+import { UI } from "@/scripts/client/ui";
 
 import { MessagesToContent } from "@/messages";
 import { sendToBackground } from "@/sendToBackground";
 
 (async () => {
-  const overlay = new Overlay();
+  const ui = new UI();
   const currentMousePosition = { x: 0, y: 0 };
-  let clickedElement: { element: HTMLElement; rect: DOMRect } | undefined;
   let enabledRightClick = false;
   setInterval(async () => {
     enabledRightClick = await sendToBackground("getRightClickEnable");
   }, 200);
-  setInterval(() => {
-    if (clickedElement !== undefined) {
-      clickedElement.rect = clickedElement.element.getBoundingClientRect();
-    }
-  }, 1000 / 30);
   async function select(x: number, y: number) {
-    const _elements = Array.from(document.querySelectorAll("*")) as HTMLElement[];
-    function getDepth(element: HTMLElement) {
-      let parent: HTMLElement | null = element.parentElement;
-      let depth = 0;
-      while (parent !== null) {
-        parent = parent?.parentElement;
-        depth++;
-      }
-      return depth;
-    }
-    const results: Result[] = _elements
-      .map((element) => ({
-        element,
-        rect: element.getBoundingClientRect(),
-        urls: getURLsFromElement(element),
-        depth: getDepth(element),
-      }))
-      .filter((res) => {
-        const rect = res.rect;
-        const isInRect = rect.left < x && rect.right > x && rect.top < y && rect.bottom > y;
-        const hasURL = res.urls.length > 0;
-        return isInRect && hasURL;
-      })
-      .sort((a, b) => b.depth - a.depth);
-    overlay.show(results, { x, y });
+    const results = getData({ x, y });
+    ui.show(results, { x, y });
   }
-  overlay.onSave = async (url) => {
+  ui.onSave = async (url) => {
     let urls = [url];
     urls = pinterest(urls);
     urls = twitter(urls);
@@ -57,12 +27,12 @@ import { sendToBackground } from "@/sendToBackground";
       name: document.title,
       note: location.href,
     });
-    overlay.setStatus("saving");
+    ui.setStatus("saving");
     const result = await sendToBackground("save");
     if (result) {
-      overlay.setStatus("saved");
+      ui.setStatus("saved");
     } else {
-      overlay.setStatus("failed");
+      ui.setStatus("failed");
     }
   };
   // overlay.captureButton.addEventListener("click", async () => {
@@ -127,13 +97,12 @@ import { sendToBackground } from "@/sendToBackground";
   window.addEventListener(
     "pointerdown",
     (event) => {
-      if (event.target === overlay.root) {
+      if (event.target === ui.root) {
         event.preventDefault();
         return;
       }
       if (!enabledRightClick || event.button !== 2) {
-        overlay.hide();
-        clickedElement = undefined;
+        ui.hide();
         return;
       }
       event.preventDefault();
