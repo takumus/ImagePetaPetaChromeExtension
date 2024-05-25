@@ -1,6 +1,4 @@
-// import { icon } from "@/scripts/icon";
-import { pinterest } from "@/scripts/client/drivers/pinterest";
-import { twitter } from "@/scripts/client/drivers/twitter";
+import { urlDrivers } from "@/scripts/client/drivers";
 import { getData } from "@/scripts/client/imageParser";
 import { UI } from "@/scripts/client/ui";
 
@@ -11,12 +9,16 @@ import { sendToBackground } from "@/sendToBackground";
   const ui = new UI();
   const currentMousePosition = { x: 0, y: 0 };
   async function select(x: number, y: number) {
-    ui.show(getData({ x, y }), { x, y });
+    ui.show(
+      getData({ x, y }).map((d) => {
+        d.urls = urlDrivers.reduce<string[]>((urls, driver) => driver(urls), d.urls);
+        return d;
+      }),
+      { x, y },
+    );
   }
   ui.onSave = async (url) => {
     let urls = [url];
-    urls = pinterest(urls);
-    urls = twitter(urls);
     console.log(urls);
     await sendToBackground("orderSave", urls, window.location.origin, window.navigator.userAgent, {
       name: document.title,
