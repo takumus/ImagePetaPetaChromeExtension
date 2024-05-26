@@ -1,6 +1,10 @@
 <template>
   <e-root v-if="show">
-    <t-menu style="left: 50%; top: 50%">
+    <t-menu
+      :style="{
+        left: menuPosition.x + 'px',
+        top: menuPosition.y + 'px',
+      }">
       <t-buttons>
         <t-button class="save" v-for="url in urls" @click="save(url)">
           <t-size>{{ imgInfo[url]?.width }}x{{ imgInfo[url]?.height }}</t-size>
@@ -43,6 +47,8 @@ type ImageInfo = { width: number; height: number; loaded: boolean };
 const urls = ref<string[]>([]);
 const imgInfo = ref<{ [url: string]: ImageInfo | undefined }>({});
 const show = ref(false);
+const menuPosition = ref({ x: 0, y: 0 });
+const mousePosition = ref({ x: 0, y: 0 });
 let currentImageParseResult = ref<ImageParserResult[]>([]);
 async function save(url: string) {
   let urls = [url];
@@ -60,6 +66,7 @@ function setSize(url: string, info: ImageInfo) {
   }
 }
 async function select(x: number, y: number) {
+  menuPosition.value = { x, y };
   currentImageParseResult.value = getData({ x, y }).map((d) => {
     d.urls = urlDrivers.reduce<string[]>((urls, driver) => driver(urls), d.urls);
     return d;
@@ -69,7 +76,7 @@ async function select(x: number, y: number) {
   );
   imgInfo.value = urls.value.reduce<{ [url: string]: ImageInfo }>((p, c) => {
     return {
-      [c]: { width: 0, height: 0, loaded: false },
+      [c]: imgInfo.value[c] ?? { width: 0, height: 0, loaded: false },
       ...p,
     };
   }, {});
@@ -85,7 +92,6 @@ function updateBoxes(updateRect = false) {
   }
 }
 onMounted(() => {
-  const currentMousePosition = { x: 0, y: 0 };
   let enabledRightClick = false;
   const ub = () => {
     updateBoxes(true);
@@ -165,12 +171,12 @@ onMounted(() => {
     true,
   );
   window.document.addEventListener("mousemove", (event) => {
-    currentMousePosition.x = event.clientX;
-    currentMousePosition.y = event.clientY;
+    mousePosition.value.x = event.clientX;
+    mousePosition.value.y = event.clientY;
   });
   const messageFunctions: MessagesToContent = {
     openMenu: async () => {
-      select(currentMousePosition.x, currentMousePosition.y);
+      select(mousePosition.value.x, mousePosition.value.y);
     },
   };
   chrome.runtime.onMessage.addListener((request, _, response) => {
