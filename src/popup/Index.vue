@@ -10,8 +10,7 @@
 import VCheckbox from "imagepetapeta-beta/src/renderer/components/commons/utils/checkbox/VCheckbox.vue";
 import { onMounted, ref, watch } from "vue";
 
-import { icon } from "@/scripts/icon";
-
+import { icon } from "@/icon";
 import { sendToBackground } from "@/sendToBackground";
 
 const enabled = ref(false);

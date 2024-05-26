@@ -4,11 +4,10 @@ import {
 } from "imagepetapeta-beta/src/commons/datas/importFileGroup";
 import { v4 } from "uuid";
 
-import { _alert } from "@/scripts/background/alert";
-import { checkApp } from "@/scripts/background/checkApp";
-import { getCurrentTab } from "@/scripts/background/getCurrentTab";
-
 import { InjectedData } from "@/@types/injectedData";
+import { _alert } from "@/background/alert";
+import { checkApp } from "@/background/checkApp";
+import { getCurrentTab } from "@/background/getCurrentTab";
 import { sendToApp } from "@/commons/sendToApp";
 import { MessagesToBackground } from "@/messages";
 import { sendToContent } from "@/sendToContent";

@@ -11,7 +11,7 @@
   </e-boxes-root>
 </template>
 <script setup lang="ts">
-import { ImageParserResult } from "@/scripts/content/imageParser";
+import { ImageParserResult } from "@/content/imageParser";
 
 defineProps<{
   imageParserResult: ImageParserResult[];

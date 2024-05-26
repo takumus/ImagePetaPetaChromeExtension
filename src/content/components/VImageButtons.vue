@@ -18,9 +18,9 @@
   </e-image-buttons-root>
 </template>
 <script setup lang="ts">
-import { ImageInfo, ImageInfoSaveState } from "@/scripts/content/components/imageInfo";
-import { getImageExtension } from "@/scripts/content/getImageExtension";
-import { ImageParserResult } from "@/scripts/content/imageParser";
+import { ImageInfo, ImageInfoSaveState } from "@/content/components/imageInfo";
+import { getImageExtension } from "@/content/getImageExtension";
+import { ImageParserResult } from "@/content/imageParser";
 
 const props = defineProps<{
   urls: string[];

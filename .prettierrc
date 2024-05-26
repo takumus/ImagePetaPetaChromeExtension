@@ -10,8 +10,6 @@
   "importOrder": [
     "<THIRD_PARTY_MODULES>",
     "",
-    "^@/scripts/(.*)$",
-    "",
     "^@/(.*)$"
   ],
   "bracketSameLine": true,

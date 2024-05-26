@@ -7,12 +7,12 @@ import { defineConfig } from "vite";
 export default defineConfig({
   build: {
     minify: false,
-    outDir: resolve("./dist/scripts"),
-    emptyOutDir: true,
+    outDir: resolve("./dist/"),
+    emptyOutDir: false,
     lib: {
       entry: {
-        background: resolve("./src/scripts/background/index.ts"),
-        // content: resolve("./src/scripts/content/index.ts"),
+        background: resolve("./src/background/index.ts"),
+        // content: resolve("./src/content/index.ts"),
       },
       formats: ["es"],
       // fileName: "background",

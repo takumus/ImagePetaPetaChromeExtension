@@ -1,8 +1,8 @@
 import { applyStyle, defaultStyles } from "imagepetapeta-beta/src/renderer/styles/styles";
 import { createApp } from "vue";
 
-import App from "@/scripts/content/components/VIndex.vue";
-import { createInjectedDataStore, injectedDataStoreKey } from "@/scripts/content/injectedData";
+import App from "@/content/components/VIndex.vue";
+import { createInjectedDataStore, injectedDataStoreKey } from "@/content/injectedData";
 
 applyStyle(defaultStyles.dark);
 (async () => {

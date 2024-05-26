@@ -11,7 +11,7 @@ export const manifest: chrome.runtime.Manifest = {
   permissions: ["tabs", "scripting", "contextMenus"],
   host_permissions: ["<all_urls>"],
   background: {
-    service_worker: "scripts/background.mjs",
+    service_worker: "background.mjs",
     type: "module",
   },
   icons: {

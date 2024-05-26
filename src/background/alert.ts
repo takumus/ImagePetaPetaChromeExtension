@@ -1,4 +1,4 @@
-import { getCurrentTab } from "@/scripts/background/getCurrentTab";
+import { getCurrentTab } from "@/background/getCurrentTab";
 
 export async function _alert(message: string) {
   const tabId = (await getCurrentTab())?.id;

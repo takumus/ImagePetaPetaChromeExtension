@@ -1,8 +1,7 @@
 import { AppInfo } from "imagepetapeta-beta/src/commons/datas/appInfo";
 import { CHROME_EXTENSION_VERSION } from "imagepetapeta-beta/src/commons/defines";
 
-import { _alert } from "@/scripts/background/alert";
-
+import { _alert } from "@/background/alert";
 import { sendToApp } from "@/commons/sendToApp";
 
 export async function checkApp() {

@@ -1,4 +1,4 @@
-import { getURLsFromElement } from "@/scripts/content/imageParser/getURLsFromElement";
+import { getURLsFromElement } from "@/content/imageParser/getURLsFromElement";
 
 export interface ImageParserResult {
   element: HTMLElement;

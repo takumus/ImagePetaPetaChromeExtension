@@ -22,13 +22,12 @@
 import VImageButtons from "./VImageButtons.vue";
 import { inject, onMounted, ref } from "vue";
 
-import { ImageInfo, ImageInfoSaveState } from "@/scripts/content/components/imageInfo";
-import VBoxes from "@/scripts/content/components/VBoxes.vue";
-import { urlDrivers } from "@/scripts/content/drivers";
-import { getData, ImageParserResult } from "@/scripts/content/imageParser";
-import { injectedDataStoreKey } from "@/scripts/content/injectedData";
-import { icon, subIcon } from "@/scripts/icon";
-
+import { ImageInfo, ImageInfoSaveState } from "@/content/components/imageInfo";
+import VBoxes from "@/content/components/VBoxes.vue";
+import { urlDrivers } from "@/content/drivers";
+import { getData, ImageParserResult } from "@/content/imageParser";
+import { injectedDataStoreKey } from "@/content/injectedData";
+import { icon, subIcon } from "@/icon";
 import { MessagesToContent } from "@/messages";
 import { sendToBackground } from "@/sendToBackground";
 
