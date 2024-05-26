@@ -16,7 +16,7 @@
           v-for="url in urls"
           @click="save(url)"
           :class="{
-            [savedURLs[url]]: true,
+            [imgInfo[url]?.saveState!]: true,
           }">
           <e-size>
             {{ imgInfo[url]?.type }}({{ imgInfo[url]?.width }}x{{ imgInfo[url]?.height }})
@@ -45,8 +45,14 @@ import { icon, subIcon } from "@/scripts/icon";
 import { MessagesToContent } from "@/messages";
 import { sendToBackground } from "@/sendToBackground";
 
-type ImageInfo = { width: number; height: number; loaded: boolean; type: string };
-type SaveState = "saving" | "saved" | "failed";
+type ImageInfo = {
+  width: number;
+  height: number;
+  loaded: boolean;
+  type: string;
+  saveState: SaveState;
+};
+type SaveState = "saving" | "saved" | "failed" | "none";
 const urls = ref<string[]>([]);
 const imgInfo = ref<{ [url: string]: ImageInfo | undefined }>({});
 const show = ref(false);
@@ -56,20 +62,19 @@ const menuPosition = ref({ x: 0, y: 0 });
 const menuTargetPosition = ref({ x: 0, y: 0 });
 const mousePosition = ref({ x: 0, y: 0 });
 const injectedData = inject(injectedDataStoreKey);
-const savedURLs = ref<{ [url: string]: SaveState }>({});
 if (injectedData === undefined) {
   throw "impt inject error";
 }
 let currentImageParseResult = ref<ImageParserResult[]>([]);
 function setImageInfo(element: HTMLImageElement) {
-  if (imgInfo.value[element.src] !== undefined) {
-    imgInfo.value[element.src] = {
-      ...imgInfo.value[element.src],
+  const info = imgInfo.value[element.src];
+  if (info !== undefined) {
+    Object.assign<ImageInfo, Partial<ImageInfo>>(info, {
       width: element.naturalWidth,
       height: element.naturalHeight,
       loaded: true,
       type: getImageExtension(element.src) ?? "unknown",
-    };
+    });
   }
 }
 async function save(url: string) {
@@ -80,7 +85,10 @@ async function save(url: string) {
   });
   const result = await sendToBackground("save");
   if (result !== undefined && result.length > 0) {
-    savedURLs.value[url] = "saved";
+    const info = imgInfo.value[url];
+    if (info !== undefined) {
+      info.saveState = "saved";
+    }
   }
 }
 async function select(x: number, y: number) {
@@ -94,7 +102,13 @@ async function select(x: number, y: number) {
   );
   imgInfo.value = urls.value.reduce<{ [url: string]: ImageInfo }>((p, c) => {
     return {
-      [c]: imgInfo.value[c] ?? { width: 0, height: 0, loaded: false, type: "unknown" },
+      [c]: imgInfo.value[c] ?? {
+        width: 0,
+        height: 0,
+        loaded: false,
+        type: "unknown",
+        saveState: "none",
+      },
       ...p,
     };
   }, {});
@@ -129,7 +143,6 @@ function updateMenuPosition(optionalRect?: DOMRect) {
 }
 function hide() {
   show.value = false;
-  savedURLs.value = {};
 }
 onMounted(() => {
   let enabledRightClick = false;
