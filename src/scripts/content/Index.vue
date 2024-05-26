@@ -19,8 +19,8 @@
             [savedURLs[url]]: true,
           }">
           <e-size>
-            {{ imgInfo[url]?.type }}({{ imgInfo[url]?.width }}x{{ imgInfo[url]?.height }})</e-size
-          >
+            {{ imgInfo[url]?.type }}({{ imgInfo[url]?.width }}x{{ imgInfo[url]?.height }})
+          </e-size>
           <img
             :src="url"
             v-show="imgInfo[url]?.loaded"
