@@ -18,14 +18,14 @@
     </div>
     <div class="boxes" id="boxes">
       <div
-        v-for="box in boxes"
+        v-for="ipr in currentImageParseResult"
         class="template box"
         id="box"
         :style="{
-          top: box.y + 'px',
-          left: box.x + 'px',
-          width: box.width + 'px',
-          height: box.height + 'px',
+          top: ipr.rect.y + 'px',
+          left: ipr.rect.x + 'px',
+          width: ipr.rect.width + 'px',
+          height: ipr.rect.height + 'px',
         }"></div>
     </div>
     <div class="background" id="background"></div>
@@ -44,8 +44,8 @@ import { sendToBackground } from "@/sendToBackground";
 type ImageInfo = { width: number; height: number; loaded: boolean };
 const urls = ref<string[]>([]);
 const imgInfo = ref<{ [url: string]: ImageInfo | undefined }>({});
-const boxes = ref<{ x: number; y: number; width: number; height: number }[]>([]);
 const show = ref(false);
+let currentImageParseResult = ref<ImageParserResult[]>([]);
 async function save(url: string) {
   let urls = [url];
   console.log(urls);
@@ -61,27 +61,40 @@ function setSize(url: string, info: ImageInfo) {
     imgInfo.value[url] = info;
   }
 }
+async function select(x: number, y: number) {
+  currentImageParseResult.value = getData({ x, y }).map((d) => {
+    d.urls = urlDrivers.reduce<string[]>((urls, driver) => driver(urls), d.urls);
+    return d;
+  });
+  urls.value = Array.from(
+    new Set(currentImageParseResult.value.reduce<string[]>((p, c) => [...c.urls, ...p], [])),
+  );
+  imgInfo.value = urls.value.reduce<{ [url: string]: ImageInfo }>((p, c) => {
+    return {
+      [c]: { width: 0, height: 0, loaded: false },
+      ...p,
+    };
+  }, {});
+  console.log(currentImageParseResult);
+  show.value = true;
+  updateBoxes();
+}
+function updateBoxes(updateRect = false) {
+  if (updateRect) {
+    currentImageParseResult.value.forEach((r) => {
+      r.rect = r.element.getBoundingClientRect();
+    });
+  }
+}
 onMounted(() => {
-  console.log("hello");
   const currentMousePosition = { x: 0, y: 0 };
   let enabledRightClick = false;
+  const ub = () => {
+    updateBoxes(true);
+    requestAnimationFrame(ub);
+  };
+  ub();
   setInterval(async () => (enabledRightClick = await sendToBackground("getRightClickEnable")), 100);
-  async function select(x: number, y: number) {
-    const datas = getData({ x, y }).map((d) => {
-      d.urls = urlDrivers.reduce<string[]>((urls, driver) => driver(urls), d.urls);
-      return d;
-    });
-    urls.value = Array.from(new Set(datas.reduce<string[]>((p, c) => [...c.urls, ...p], [])));
-    imgInfo.value = urls.value.reduce<{ [url: string]: ImageInfo }>((p, c) => {
-      return {
-        [c]: { width: 0, height: 0, loaded: false },
-        ...p,
-      };
-    }, {});
-    boxes.value = datas.map((d) => d.rect);
-    console.log(datas);
-    show.value = true;
-  }
   // overlay.captureButton.addEventListener("click", async () => {
   //   overlay.setStatus("saving");
   //   const domRect = clickedElement?.rect;
@@ -131,7 +144,6 @@ onMounted(() => {
   //     overlay.setStatus("failed");
   //   }
   // });
-  console.log(window);
   window.document.addEventListener(
     "contextmenu",
     (event) => {
