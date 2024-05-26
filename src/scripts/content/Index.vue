@@ -1,9 +1,9 @@
 <template>
   <e-root v-if="show">
-    <div class="menu" id="menu" style="left: 50%; top: 50%">
-      <div class="buttons" id="buttons">
-        <div class="template button save" v-for="url in urls" @click="save(url)">
-          <div class="size">{{ imgInfo[url]?.width }}x{{ imgInfo[url]?.height }}</div>
+    <t-menu style="left: 50%; top: 50%">
+      <t-buttons>
+        <t-button class="save" v-for="url in urls" @click="save(url)">
+          <t-size>{{ imgInfo[url]?.width }}x{{ imgInfo[url]?.height }}</t-size>
           <img
             :src="url"
             v-show="imgInfo[url]?.loaded"
@@ -13,22 +13,20 @@
                 setSize(url, { width: img.naturalWidth, height: img.naturalHeight, loaded: true });
               }
             " />
-        </div>
-      </div>
-    </div>
-    <div class="boxes" id="boxes">
-      <div
+        </t-button>
+      </t-buttons>
+    </t-menu>
+    <t-boxes>
+      <t-box
         v-for="ipr in currentImageParseResult"
-        class="template box"
-        id="box"
         :style="{
           top: ipr.rect.y + 'px',
           left: ipr.rect.x + 'px',
           width: ipr.rect.width + 'px',
           height: ipr.rect.height + 'px',
-        }"></div>
-    </div>
-    <div class="background" id="background"></div>
+        }"></t-box>
+    </t-boxes>
+    <t-background></t-background>
   </e-root>
 </template>
 <script setup lang="ts">
@@ -195,7 +193,7 @@ onMounted(() => {
     "ヒラギノ角ゴ ProN W3", "Hiragino Kaku Gothic ProN", "ヒラギノ角ゴ Pro W3",
     "Hiragino Kaku Gothic Pro", メイリオ, Meiryo, "MS ゴシック", "MS Gothic", sans-serif;
 }
-.boxes > .box {
+t-boxes > t-box {
   position: fixed;
   top: 0px;
   left: 0px;
@@ -213,7 +211,7 @@ onMounted(() => {
   height: 100%;
   pointer-events: none;
 }
-.background {
+t-background {
   position: fixed;
   top: 0px;
   left: 0px;
@@ -223,7 +221,7 @@ onMounted(() => {
   height: 100%;
   pointer-events: none;
 }
-.menu {
+t-menu {
   display: flex;
   position: fixed;
   flex-direction: column;
@@ -237,44 +235,46 @@ onMounted(() => {
   max-width: 30%;
   max-height: 50%;
   pointer-events: auto;
-}
-.menu > .buttons {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: 8px;
-  padding-right: 8px;
-  width: 100%;
-  overflow-x: hidden;
-  overflow-y: auto;
-  pointer-events: auto !important;
-}
-.menu > .buttons > .button {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 4px;
-  cursor: pointer;
-  border-radius: 4px;
-  padding: 8px;
-  width: 100%;
-  max-height: 300px;
-  color: #333333;
-  font-weight: bold;
-  font-size: 18px;
-}
-.menu > .buttons > .button:hover {
-  background-color: #dedede;
-}
-.menu > .buttons > .button.save > img {
-  display: block;
-  border-radius: 4px;
-  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAADNJREFUOI1jvHz58n8GPEBHRwefNAMTXlkiwKgBg8EAxv///+NNB1euXKGtC0YNGAwGAAAfVwqTIQ+HUgAAAABJRU5ErkJggg==);
-  max-width: 100%;
-  height: auto;
-  overflow: hidden;
-  pointer-events: none;
+  > t-buttons {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 8px;
+    padding-right: 8px;
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    pointer-events: auto !important;
+    > t-button {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      border-radius: 4px;
+      padding: 8px;
+      width: 100%;
+      max-height: 300px;
+      color: #333333;
+      font-weight: bold;
+      font-size: 18px;
+      &:hover {
+        background-color: #dedede;
+      }
+      &.save {
+        > img {
+          display: block;
+          border-radius: 4px;
+          background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAADNJREFUOI1jvHz58n8GPEBHRwefNAMTXlkiwKgBg8EAxv///+NNB1euXKGtC0YNGAwGAAAfVwqTIQ+HUgAAAABJRU5ErkJggg==);
+          max-width: 100%;
+          height: auto;
+          overflow: hidden;
+          pointer-events: none;
+        }
+      }
+    }
+  }
 }
 </style>
 <style lang="scss">
