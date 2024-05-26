@@ -241,9 +241,10 @@ onMounted(() => {
 *:after {
   all: initial;
   box-sizing: border-box;
-  font-family: "Helvetica Neue", Helvetica, Arial, YuGothic, "Yu Gothic", 游ゴシック体, 游ゴシック,
-    "ヒラギノ角ゴ ProN W3", "Hiragino Kaku Gothic ProN", "ヒラギノ角ゴ Pro W3",
-    "Hiragino Kaku Gothic Pro", メイリオ, Meiryo, "MS ゴシック", "MS Gothic", sans-serif;
+  font-size: 16px;
+  line-height: 16px;
+  font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo,
+    sans-serif;
 }
 *::-webkit-scrollbar {
   width: var(--px-2);
