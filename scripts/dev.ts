@@ -5,6 +5,7 @@ import kill from "tree-kill";
 const childProcesses = [
   spawn("npm", ["run", "dev:scripts"]),
   spawn("npm", ["run", "dev:popup"]),
+  spawn("npm", ["run", "dev:ui"]),
   spawn("npm", ["run", "dev:manifest"]),
 ];
 keypress(process.stdin);

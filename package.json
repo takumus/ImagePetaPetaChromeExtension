@@ -32,6 +32,7 @@
     "dev": "tsx ./scripts/dev.ts",
     "dev:scripts": "vite build --watch --config vite.scripts.config.ts",
     "dev:popup": "vite build --watch --config vite.popup.config.ts",
+    "dev:ui": "vite build --watch --config vite.ui.config.ts",
     "dev:manifest": "tsx watch ./scripts/buildManifest.ts",
     "generate": "run-p generate:*",
     "generate:dir": "tsx ./scripts/generateDir.ts",

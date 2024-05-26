@@ -128,9 +128,27 @@ async function inject(tabId: number) {
     if (!result) {
       return;
     }
+    const style = await (await fetch(chrome.runtime.getURL("content/assets/index.css"))).text();
     await chrome.scripting.executeScript({
       target: { tabId },
-      files: ["./scripts/client.mjs"],
+      func: (styleString: string) => {
+        const root = document.createElement("div");
+        const rootShadow = root.attachShadow({ mode: "closed" });
+        const app = document.createElement("div");
+        const style = document.createElement("style");
+        style.innerHTML = styleString;
+        style.style.display = "none";
+        rootShadow.append(style);
+        rootShadow.append(app);
+        document.body.append(root);
+        (window as any)["impt-ui-element"] = app;
+        (window as any)["impt-ui-element-root"] = root;
+      },
+      args: [style],
+    });
+    await chrome.scripting.executeScript({
+      target: { tabId },
+      files: ["./content/assets/index.js"],
     });
   } catch {
     //
@@ -180,3 +198,7 @@ chrome.runtime.onInstalled.addListener(() => {
     title: "Save Images",
   });
 });
+
+// const style = await (
+//   await fetch(chrome.runtime.getURL("popup/assets/index-BGiOXsqW.css"))
+// ).text();

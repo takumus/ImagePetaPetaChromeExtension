@@ -12,7 +12,7 @@ export default defineConfig({
     lib: {
       entry: {
         background: resolve("./src/scripts/background/index.ts"),
-        client: resolve("./src/scripts/client/index.ts"),
+        // content: resolve("./src/scripts/content/index.ts"),
       },
       formats: ["es"],
       // fileName: "background",
