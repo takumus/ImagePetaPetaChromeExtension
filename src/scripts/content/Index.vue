@@ -18,12 +18,7 @@
           <img
             :src="url"
             v-show="imgInfo[url]?.loaded"
-            @load="
-              (t) => {
-                const img = t.target as HTMLImageElement;
-                setSize(url, { width: img.naturalWidth, height: img.naturalHeight, loaded: true });
-              }
-            " />
+            @load="(e) => setImageInfo(url, e.target as HTMLImageElement)" />
         </t-button>
       </t-buttons>
     </t-menu>
@@ -65,6 +60,15 @@ if (injectedData === undefined) {
   throw "impt inject error";
 }
 let currentImageParseResult = ref<ImageParserResult[]>([]);
+function setImageInfo(url: string, element: HTMLImageElement) {
+  if (imgInfo.value[url] !== undefined) {
+    imgInfo.value[url] = {
+      width: element.naturalWidth,
+      height: element.naturalHeight,
+      loaded: true,
+    };
+  }
+}
 async function save(url: string) {
   let urls = [url];
   await sendToBackground("orderSave", urls, window.location.origin, window.navigator.userAgent, {
@@ -74,11 +78,6 @@ async function save(url: string) {
   const result = await sendToBackground("save");
   if (result !== undefined && result.length > 0) {
     savedURLs.value[url] = "saved";
-  }
-}
-function setSize(url: string, info: ImageInfo) {
-  if (imgInfo.value[url]) {
-    imgInfo.value[url] = info;
   }
 }
 async function select(x: number, y: number) {
