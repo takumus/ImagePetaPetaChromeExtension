@@ -11,21 +11,7 @@
         <e-label>ImagePetaPeta</e-label>
       </e-icon>
       <e-buttons>
-        <e-button
-          class="save"
-          v-for="url in urls"
-          @click="save(url)"
-          :class="{
-            [imgInfo[url]?.saveState!]: true,
-          }">
-          <e-size>
-            {{ imgInfo[url]?.type }}({{ imgInfo[url]?.width }}x{{ imgInfo[url]?.height }})
-          </e-size>
-          <img
-            :src="url"
-            v-show="imgInfo[url]?.loaded"
-            @load="setImageInfo($event.target as HTMLImageElement)" />
-        </e-button>
+        <VImageButtons :urls="urls" :img-info="imgInfo" @save="save" />
       </e-buttons>
     </e-menu>
     <VBoxes :image-parser-result="currentImageParseResult" />
@@ -33,11 +19,12 @@
   </e-window-root>
 </template>
 <script setup lang="ts">
+import VImageButtons from "./VImageButtons.vue";
 import { inject, onMounted, ref } from "vue";
 
+import { ImageInfo, ImageInfoSaveState } from "@/scripts/content/components/imageInfo";
 import VBoxes from "@/scripts/content/components/VBoxes.vue";
 import { urlDrivers } from "@/scripts/content/drivers";
-import { getImageExtension } from "@/scripts/content/getImageExtension";
 import { getData, ImageParserResult } from "@/scripts/content/imageParser";
 import { injectedDataStoreKey } from "@/scripts/content/injectedData";
 import { icon, subIcon } from "@/scripts/icon";
@@ -45,14 +32,6 @@ import { icon, subIcon } from "@/scripts/icon";
 import { MessagesToContent } from "@/messages";
 import { sendToBackground } from "@/sendToBackground";
 
-type ImageInfo = {
-  width: number;
-  height: number;
-  loaded: boolean;
-  type: string;
-  saveState: SaveState;
-};
-type SaveState = "saving" | "saved" | "failed" | "none";
 const urls = ref<string[]>([]);
 const imgInfo = ref<{ [url: string]: ImageInfo | undefined }>({});
 const show = ref(false);
@@ -66,17 +45,6 @@ if (injectedData === undefined) {
   throw "impt inject error";
 }
 let currentImageParseResult = ref<ImageParserResult[]>([]);
-function setImageInfo(element: HTMLImageElement) {
-  const info = imgInfo.value[element.src];
-  if (info !== undefined) {
-    Object.assign<ImageInfo, Partial<ImageInfo>>(info, {
-      width: element.naturalWidth,
-      height: element.naturalHeight,
-      loaded: true,
-      type: getImageExtension(element.src) ?? "unknown",
-    });
-  }
-}
 async function save(url: string) {
   let urls = [url];
   await sendToBackground("orderSave", urls, window.location.origin, window.navigator.userAgent, {
@@ -327,48 +295,8 @@ e-window-root {
       display: flex;
       flex: 1;
       flex-direction: column;
-      gap: var(--px-2);
-      padding-right: var(--px-2);
       width: 100%;
       overflow: hidden;
-      overflow-y: auto;
-      pointer-events: auto !important;
-      > e-button {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        gap: var(--px-1);
-        cursor: pointer;
-        border-radius: var(--rounded);
-        padding: var(--px-2);
-        width: 100%;
-        max-height: 300px;
-        font-weight: bold;
-        > e-size {
-          color: var(--color-font);
-        }
-        &:hover {
-          background-color: var(--color-2);
-        }
-        &:active {
-          background-color: var(--color-accent-1);
-        }
-        &.saved {
-          opacity: 0.5;
-        }
-        &.save {
-          > img {
-            display: block;
-            border-radius: var(--rounded);
-            background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAADNJREFUOI1jvHz58n8GPEBHRwefNAMTXlkiwKgBg8EAxv///+NNB1euXKGtC0YNGAwGAAAfVwqTIQ+HUgAAAABJRU5ErkJggg==);
-            max-width: 100%;
-            height: auto;
-            overflow: hidden;
-            pointer-events: none;
-          }
-        }
-      }
     }
   }
 }
