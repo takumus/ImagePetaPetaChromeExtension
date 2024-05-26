@@ -23,7 +23,8 @@
     "tree-kill": "^1.2.2",
     "tsx": "^4.11.0",
     "typescript": "^5.4.5",
-    "vite": "^5.2.11"
+    "vite": "^5.2.11",
+    "vue-tsc": "^2.0.19"
   },
   "scripts": {
     "build": "run-s build:*",
@@ -43,7 +44,10 @@
     "prebuild": "npm run generate",
     "format": "prettier --write \"**/*.{ts,html}\"",
     "check-updates": "npm-check-updates",
-    "check-updates-u": "npm-check-updates -u"
+    "check-updates-u": "npm-check-updates -u",
+    "tsc": "run-s tsc:*",
+    "tsc:main": "tsc -p ./tsconfig.json --noEmit",
+    "tsc:renderer": "vue-tsc --noEmit"
   },
   "author": "",
   "volta": {
