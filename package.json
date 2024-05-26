@@ -5,25 +5,24 @@
   "main": "index.js",
   "devDependencies": {
     "@ianvs/prettier-plugin-sort-imports": "^4.2.1",
-    "@trivago/prettier-plugin-sort-imports": "^3.4.0",
-    "@types/chrome": "^0.0.231",
-    "@types/node": "18.8.0",
-    "@types/recursive-readdir": "^2.2.1",
-    "@types/throttle-debounce": "^5.0.0",
-    "@vitejs/plugin-vue": "^4.2.3",
+    "@types/chrome": "^0.0.268",
+    "@types/node": "20.12.12",
+    "@types/recursive-readdir": "^2.2.4",
+    "@types/throttle-debounce": "^5.0.2",
+    "@vitejs/plugin-vue": "^5.0.4",
     "keypress": "^0.2.1",
-    "license-checker-rseidelsohn": "^4.2.0",
+    "license-checker-rseidelsohn": "^4.3.0",
+    "npm-check-updates": "^16.14.20",
     "npm-run-all": "^4.1.5",
     "prettier": "^3.2.5",
     "prettier-plugin-css-order": "^2.1.2",
-    "pretty-quick": "^3.1.3",
+    "pretty-quick": "^4.0.0",
     "recursive-readdir": "^2.2.3",
-    "sass": "^1.61.0",
+    "sass": "^1.77.2",
     "tree-kill": "^1.2.2",
-    "tsx": "^3.12.7",
-    "typescript": "^5.0.2",
-    "vite": "^4.1.4",
-    "vite-plugin-node-stdlib-browser": "^0.2.1"
+    "tsx": "^4.11.0",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.11"
   },
   "scripts": {
     "build": "run-s build:*",
@@ -39,7 +38,9 @@
     "generate:icon": "tsx ./scripts/buildIcon.ts",
     "predev": "npm run generate",
     "prebuild": "npm run generate",
-    "format": "prettier --write \"**/*.{ts,html}\""
+    "format": "prettier --write \"**/*.{ts,html}\"",
+    "check-updates": "npm-check-updates",
+    "check-updates-u": "npm-check-updates -u"
   },
   "author": "",
   "volta": {
@@ -47,10 +48,10 @@
     "npm": "10.7.0"
   },
   "dependencies": {
-    "file-type": "^18.3.0",
-    "imagepetapeta-beta": "git+ssh://git@github.com/takumus/ImagePetaPeta.git#e0a3d8285063f4473c56f76026f4337b0d87a0db",
+    "file-type": "^19.0.0",
     "throttle-debounce": "^5.0.0",
     "url-join": "^5.0.0",
-    "vue": "^3.3.2"
+    "vue": "^3.4.27",
+    "imagepetapeta-beta": "git+ssh://git@github.com/takumus/ImagePetaPeta.git#36016c36db67bdbe57f8fde4c1bedd06e7d1e1a1"
   }
 }
