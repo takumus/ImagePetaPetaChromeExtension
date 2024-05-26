@@ -1,6 +1,7 @@
 <template>
-  <e-root v-if="show">
+  <t-root v-if="show">
     <t-menu
+      ref="menu"
       :style="{
         left: menuPosition.x + 'px',
         top: menuPosition.y + 'px',
@@ -31,11 +32,11 @@
         }"></t-box>
     </t-boxes>
     <t-background></t-background>
-  </e-root>
+  </t-root>
 </template>
 <script setup lang="ts">
 import { urlDrivers } from "./drivers";
-import { onMounted, ref } from "vue";
+import { nextTick, onMounted, ref } from "vue";
 
 import { getData, ImageParserResult } from "@/scripts/content/imageParser";
 import { icon } from "@/scripts/icon";
@@ -47,7 +48,9 @@ type ImageInfo = { width: number; height: number; loaded: boolean };
 const urls = ref<string[]>([]);
 const imgInfo = ref<{ [url: string]: ImageInfo | undefined }>({});
 const show = ref(false);
+const menu = ref<HTMLElement>();
 const menuPosition = ref({ x: 0, y: 0 });
+const menuTargetPosition = ref({ x: 0, y: 0 });
 const mousePosition = ref({ x: 0, y: 0 });
 let currentImageParseResult = ref<ImageParserResult[]>([]);
 async function save(url: string) {
@@ -66,7 +69,7 @@ function setSize(url: string, info: ImageInfo) {
   }
 }
 async function select(x: number, y: number) {
-  menuPosition.value = { x, y };
+  menuTargetPosition.value = { x, y };
   currentImageParseResult.value = getData({ x, y }).map((d) => {
     d.urls = urlDrivers.reduce<string[]>((urls, driver) => driver(urls), d.urls);
     return d;
@@ -83,6 +86,7 @@ async function select(x: number, y: number) {
   console.log(currentImageParseResult);
   show.value = true;
   updateBoxes();
+  updateMenuPosition();
 }
 function updateBoxes(updateRect = false) {
   if (updateRect) {
@@ -91,13 +95,35 @@ function updateBoxes(updateRect = false) {
     });
   }
 }
+function updateMenuPosition(optionalRect?: DOMRect) {
+  if (show.value && menu.value !== undefined) {
+    const rect = optionalRect ?? menu.value.getBoundingClientRect();
+    let { x, y } = menuTargetPosition.value;
+    if (window.innerWidth < rect.width + menuTargetPosition.value.x) {
+      x = menuTargetPosition.value.x - rect.width;
+    }
+    if (window.innerHeight < rect.height + menuTargetPosition.value.y) {
+      y = menuTargetPosition.value.y - rect.height;
+    }
+    menuPosition.value = { x, y };
+  }
+}
 onMounted(() => {
   let enabledRightClick = false;
   const ub = () => {
     updateBoxes(true);
+    updateMenuPosition();
     requestAnimationFrame(ub);
   };
   ub();
+  if (menu.value !== undefined) {
+    new ResizeObserver((entries) => {
+      const rect = entries[0]?.contentRect;
+      if (rect) {
+        updateMenuPosition(rect);
+      }
+    }).observe(menu.value);
+  }
   setInterval(async () => (enabledRightClick = await sendToBackground("getRightClickEnable")), 100);
   // overlay.captureButton.addEventListener("click", async () => {
   //   overlay.setStatus("saving");
@@ -199,84 +225,91 @@ onMounted(() => {
     "ヒラギノ角ゴ ProN W3", "Hiragino Kaku Gothic ProN", "ヒラギノ角ゴ Pro W3",
     "Hiragino Kaku Gothic Pro", メイリオ, Meiryo, "MS ゴシック", "MS Gothic", sans-serif;
 }
-t-boxes > t-box {
-  position: fixed;
+t-root {
+  display: block;
+  position: absolute;
   top: 0px;
   left: 0px;
-  z-index: 2147483646;
-  margin: 0px;
-  box-shadow:
-    0px 0px 0px 2px #cccccc,
-    0px 0px 0px 2px #cccccc inset,
-    0px 0px 4px 3px rgba(0, 0, 0, 0.4),
-    0px 0px 4px 3px rgba(0, 0, 0, 0.4) inset;
-  border: solid 2px #333333;
-  border-radius: 8px;
-  padding: 0px;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-t-background {
-  position: fixed;
-  top: 0px;
-  left: 0px;
-  z-index: 2147483645;
-  background-color: rgba(0, 0, 0, 0.7);
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-t-menu {
-  display: flex;
-  position: fixed;
-  flex-direction: column;
-  align-items: center;
-  z-index: 2147483647;
-  box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.4);
-  border-radius: 8px;
-  background-color: #ffffff;
-  padding: 8px;
-  min-width: 20%;
-  max-width: 30%;
-  max-height: 50%;
-  pointer-events: auto;
-  > t-buttons {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    gap: 8px;
-    padding-right: 8px;
+  overflow: hidden;
+  > t-boxes > t-box {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    z-index: 2147483646;
+    margin: 0px;
+    box-shadow:
+      0px 0px 0px 2px #cccccc,
+      0px 0px 0px 2px #cccccc inset,
+      0px 0px 4px 3px rgba(0, 0, 0, 0.4),
+      0px 0px 4px 3px rgba(0, 0, 0, 0.4) inset;
+    border: solid 2px #333333;
+    border-radius: 8px;
+    padding: 0px;
     width: 100%;
-    overflow-x: hidden;
-    overflow-y: auto;
-    pointer-events: auto !important;
-    > t-button {
+    height: 100%;
+    pointer-events: none;
+  }
+  > t-background {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    z-index: 2147483645;
+    background-color: rgba(0, 0, 0, 0.7);
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  > t-menu {
+    display: flex;
+    position: fixed;
+    flex-direction: column;
+    align-items: center;
+    z-index: 2147483647;
+    box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.4);
+    border-radius: 8px;
+    background-color: #ffffff;
+    padding: 8px;
+    width: 40%;
+    max-height: 50%;
+    overflow: hidden;
+    pointer-events: auto;
+    > t-buttons {
       display: flex;
+      flex: 1;
       flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      gap: 4px;
-      cursor: pointer;
-      border-radius: 4px;
-      padding: 8px;
+      gap: 8px;
+      padding-right: 8px;
       width: 100%;
-      max-height: 300px;
-      color: #333333;
-      font-weight: bold;
-      font-size: 18px;
-      &:hover {
-        background-color: #dedede;
-      }
-      &.save {
-        > img {
-          display: block;
-          border-radius: 4px;
-          background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAADNJREFUOI1jvHz58n8GPEBHRwefNAMTXlkiwKgBg8EAxv///+NNB1euXKGtC0YNGAwGAAAfVwqTIQ+HUgAAAABJRU5ErkJggg==);
-          max-width: 100%;
-          height: auto;
-          overflow: hidden;
-          pointer-events: none;
+      overflow-x: hidden;
+      overflow-y: auto;
+      pointer-events: auto !important;
+      > t-button {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 4px;
+        cursor: pointer;
+        border-radius: 4px;
+        padding: 8px;
+        width: 100%;
+        max-height: 300px;
+        color: #333333;
+        font-weight: bold;
+        font-size: 18px;
+        &:hover {
+          background-color: #dedede;
+        }
+        &.save {
+          > img {
+            display: block;
+            border-radius: 4px;
+            background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAADNJREFUOI1jvHz58n8GPEBHRwefNAMTXlkiwKgBg8EAxv///+NNB1euXKGtC0YNGAwGAAAfVwqTIQ+HUgAAAABJRU5ErkJggg==);
+            max-width: 100%;
+            height: auto;
+            overflow: hidden;
+            pointer-events: none;
+          }
         }
       }
     }
