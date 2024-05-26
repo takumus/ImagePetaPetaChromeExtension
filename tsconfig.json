@@ -14,11 +14,16 @@
     "noEmit": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "src/*"
-      ],
-    },
+      "@/*": ["src/*"]
+    }
   },
-  "include": ["vite.scripts.config.ts", "vite.popup.config.ts", "package.json", "src", "scripts"],
+  "include": [
+    "vite.content.config.ts",
+    "vite.popup.config.ts",
+    "vite.content.config.ts",
+    "package.json",
+    "src",
+    "scripts"
+  ],
   "references": []
 }
