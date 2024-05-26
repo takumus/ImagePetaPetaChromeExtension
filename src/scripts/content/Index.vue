@@ -28,21 +28,13 @@
         </e-button>
       </e-buttons>
     </e-menu>
-    <e-boxes>
-      <e-box
-        v-for="ipr in currentImageParseResult"
-        :style="{
-          top: ipr.rect.y + 'px',
-          left: ipr.rect.x + 'px',
-          width: ipr.rect.width + 'px',
-          height: ipr.rect.height + 'px',
-        }"></e-box>
-    </e-boxes>
+    <VBoxes :image-parser-result="currentImageParseResult" />
     <e-background ref="background"></e-background>
   </e-window-root>
 </template>
 <script setup lang="ts">
 import { urlDrivers } from "./drivers";
+import VBoxes from "./VBoxes.vue";
 import { inject, onMounted, ref } from "vue";
 
 import { getImageExtension } from "@/scripts/content/getImageExtension";
@@ -277,24 +269,6 @@ e-window-root {
   background-color: unset !important;
   width: 0px !important;
   height: 0px !important;
-  > e-boxes > e-box {
-    position: fixed;
-    top: 0px;
-    left: 0px;
-    z-index: 2147483646;
-    margin: 0px;
-    box-shadow:
-      0px 0px 0px 2px #cccccc,
-      0px 0px 0px 2px #cccccc inset,
-      0px 0px 4px 3px rgba(0, 0, 0, 0.4),
-      0px 0px 4px 3px rgba(0, 0, 0, 0.4) inset;
-    border: solid 2px #333333;
-    border-radius: var(--rounded);
-    padding: 0px;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-  }
   > e-background {
     position: fixed;
     top: 0px;
