@@ -21,8 +21,8 @@ export async function createInjectedDataStore() {
     }
   })();
   const data = (window as any)[id] as InjectedData;
-  console.log("impt: injectId=", id);
-  console.log("impt: injectData=", data);
+  console.log("impt: injectId =", id);
+  console.log("impt: injectData =", data);
   return data;
 }
 export type InjectedDataStore = Awaited<ReturnType<typeof createInjectedDataStore>>;
