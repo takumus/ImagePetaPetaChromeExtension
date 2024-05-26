@@ -19,6 +19,7 @@ export interface MessagesToBackground {
   save: () => Promise<string[] | undefined>;
   setRightClickEnable: (value: boolean) => Promise<void>;
   getRightClickEnable: () => Promise<boolean>;
+  getInjectId: () => Promise<string>;
 }
 export interface MessagesToContent {
   openMenu: () => Promise<void>;

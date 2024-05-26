@@ -1,5 +1,5 @@
 <template>
-  <t-root v-if="show">
+  <t-root v-show="show">
     <t-menu
       ref="menu"
       :style="{
@@ -36,10 +36,10 @@
 </template>
 <script setup lang="ts">
 import { urlDrivers } from "./drivers";
-import { nextTick, onMounted, ref } from "vue";
+import { inject, onMounted, ref } from "vue";
 
 import { getData, ImageParserResult } from "@/scripts/content/imageParser";
-import { icon } from "@/scripts/icon";
+import { injectedDataStoreKey } from "@/scripts/content/injectedData";
 
 import { MessagesToContent } from "@/messages";
 import { sendToBackground } from "@/sendToBackground";
@@ -52,10 +52,13 @@ const menu = ref<HTMLElement>();
 const menuPosition = ref({ x: 0, y: 0 });
 const menuTargetPosition = ref({ x: 0, y: 0 });
 const mousePosition = ref({ x: 0, y: 0 });
+const injectedData = inject(injectedDataStoreKey);
+if (injectedData === undefined) {
+  throw "impt inject error";
+}
 let currentImageParseResult = ref<ImageParserResult[]>([]);
 async function save(url: string) {
   let urls = [url];
-  console.log(urls);
   await sendToBackground("orderSave", urls, window.location.origin, window.navigator.userAgent, {
     name: document.title,
     note: location.href,
@@ -83,7 +86,11 @@ async function select(x: number, y: number) {
       ...p,
     };
   }, {});
-  console.log(currentImageParseResult);
+  console.log(currentImageParseResult.value);
+  if (currentImageParseResult.value.length === 0) {
+    show.value = false;
+    return;
+  }
   show.value = true;
   updateBoxes();
   updateMenuPosition();
@@ -96,7 +103,7 @@ function updateBoxes(updateRect = false) {
   }
 }
 function updateMenuPosition(optionalRect?: DOMRect) {
-  if (show.value && menu.value !== undefined) {
+  if (show.value && menu.value) {
     const rect = optionalRect ?? menu.value.getBoundingClientRect();
     let { x, y } = menuTargetPosition.value;
     if (window.innerWidth < rect.width + menuTargetPosition.value.x) {
@@ -116,7 +123,7 @@ onMounted(() => {
     requestAnimationFrame(ub);
   };
   ub();
-  if (menu.value !== undefined) {
+  if (menu.value) {
     new ResizeObserver((entries) => {
       const rect = entries[0]?.contentRect;
       if (rect) {
@@ -188,7 +195,7 @@ onMounted(() => {
   window.document.addEventListener(
     "pointerdown",
     (event) => {
-      if (event.target === (window as any)["impt-ui-element-root"]) {
+      if (event.target === injectedData.domRoot) {
         event.preventDefault();
         return;
       }

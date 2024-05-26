@@ -2,11 +2,13 @@ import {
   ImportFileAdditionalData,
   ImportFileGroup,
 } from "imagepetapeta-beta/src/commons/datas/importFileGroup";
+import { v4 } from "uuid";
 
 import { _alert } from "@/scripts/background/alert";
 import { checkApp } from "@/scripts/background/checkApp";
 import { getCurrentTab } from "@/scripts/background/getCurrentTab";
 
+import { InjectedData } from "@/@types/injectedData";
 import { sendToApp } from "@/commons/sendToApp";
 import { MessagesToBackground } from "@/messages";
 import { sendToContent } from "@/sendToContent";
@@ -26,7 +28,7 @@ type MessagesToBackgroundType = {
     ...args: Parameters<MessagesToBackground[P]>
   ) => ReturnType<MessagesToBackground[P]>;
 };
-
+const injectId = v4();
 const messageFunctions: MessagesToBackgroundType = {
   async orderSave(sender, urls, referrer, ua, additionalData) {
     order = {
@@ -112,18 +114,22 @@ const messageFunctions: MessagesToBackgroundType = {
       ] as ImportFileGroup,
     ]);
   },
+  async getInjectId() {
+    return injectId;
+  },
 };
 async function inject(tabId: number) {
   try {
     const [{ result }] = await chrome.scripting.executeScript({
       target: { tabId },
-      func: async () => {
-        if ((window as any)["imagepetapeta-extension"] === true) {
+      func: async (injectId) => {
+        if ((window as any)[injectId] !== undefined) {
           return false;
         }
-        (window as any)["imagepetapeta-extension"] = true;
+        (window as any)[injectId] = {};
         return true;
       },
+      args: [injectId],
     });
     if (!result) {
       return;
@@ -131,7 +137,7 @@ async function inject(tabId: number) {
     const style = await (await fetch(chrome.runtime.getURL("content/assets/index.css"))).text();
     await chrome.scripting.executeScript({
       target: { tabId },
-      func: (styleString: string) => {
+      func: (injectId: string, styleString: string) => {
         const root = document.createElement("div");
         const rootShadow = root.attachShadow({ mode: "closed" });
         const app = document.createElement("div");
@@ -141,10 +147,11 @@ async function inject(tabId: number) {
         rootShadow.append(style);
         rootShadow.append(app);
         document.body.append(root);
-        (window as any)["impt-ui-element"] = app;
-        (window as any)["impt-ui-element-root"] = root;
+        const injectedData = (window as any)[injectId] as InjectedData;
+        injectedData.domApp = app;
+        injectedData.domRoot = root;
       },
-      args: [style],
+      args: [injectId, style],
     });
     await chrome.scripting.executeScript({
       target: { tabId },

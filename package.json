@@ -9,6 +9,7 @@
     "@types/node": "20.12.12",
     "@types/recursive-readdir": "^2.2.4",
     "@types/throttle-debounce": "^5.0.2",
+    "@types/uuid": "^9.0.8",
     "@vitejs/plugin-vue": "^5.0.4",
     "keypress": "^0.2.1",
     "license-checker-rseidelsohn": "^4.3.0",
@@ -50,9 +51,10 @@
   },
   "dependencies": {
     "file-type": "^19.0.0",
+    "imagepetapeta-beta": "git+ssh://git@github.com/takumus/ImagePetaPeta.git#36016c36db67bdbe57f8fde4c1bedd06e7d1e1a1",
     "throttle-debounce": "^5.0.0",
     "url-join": "^5.0.0",
-    "vue": "^3.4.27",
-    "imagepetapeta-beta": "git+ssh://git@github.com/takumus/ImagePetaPeta.git#36016c36db67bdbe57f8fde4c1bedd06e7d1e1a1"
+    "uuid": "^9.0.1",
+    "vue": "^3.4.27"
   }
 }
