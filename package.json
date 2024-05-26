@@ -29,6 +29,7 @@
     "build": "run-s build:*",
     "build:scripts": "vite build --config vite.scripts.config.ts",
     "build:popup": "vite build --config vite.popup.config.ts",
+    "build:ui": "vite build --config vite.ui.config.ts",
     "build:manifest": "tsx ./scripts/buildManifest.ts",
     "dev": "tsx ./scripts/dev.ts",
     "dev:scripts": "vite build --watch --config vite.scripts.config.ts",
