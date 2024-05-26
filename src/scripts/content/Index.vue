@@ -1,5 +1,5 @@
 <template>
-  <t-root v-show="show">
+  <e-window-root v-show="show">
     <t-menu
       ref="menu"
       :style="{
@@ -33,7 +33,7 @@
         }"></t-box>
     </t-boxes>
     <t-background></t-background>
-  </t-root>
+  </e-window-root>
 </template>
 <script setup lang="ts">
 import { urlDrivers } from "./drivers";
@@ -245,12 +245,22 @@ onMounted(() => {
     "ヒラギノ角ゴ ProN W3", "Hiragino Kaku Gothic ProN", "ヒラギノ角ゴ Pro W3",
     "Hiragino Kaku Gothic Pro", メイリオ, Meiryo, "MS ゴシック", "MS Gothic", sans-serif;
 }
-t-root {
+*::-webkit-scrollbar {
+  width: var(--px-2);
+}
+*::-webkit-scrollbar-thumb {
+  border-radius: var(--rounded);
+  background-color: var(--color-border);
+  min-height: var(--px-3);
+}
+e-window-root {
   display: block;
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  overflow: hidden;
+  position: absolute !important;
+  top: 0px !important;
+  left: 0px !important;
+  background-color: unset !important;
+  width: 0px !important;
+  height: 0px !important;
   > t-boxes > t-box {
     position: fixed;
     top: 0px;
@@ -263,7 +273,7 @@ t-root {
       0px 0px 4px 3px rgba(0, 0, 0, 0.4),
       0px 0px 4px 3px rgba(0, 0, 0, 0.4) inset;
     border: solid 2px #333333;
-    border-radius: 8px;
+    border-radius: var(--rounded);
     padding: 0px;
     width: 100%;
     height: 100%;
@@ -274,7 +284,7 @@ t-root {
     top: 0px;
     left: 0px;
     z-index: 2147483645;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: var(--color-overlay);
     width: 100%;
     height: 100%;
     pointer-events: none;
@@ -285,10 +295,10 @@ t-root {
     flex-direction: column;
     align-items: center;
     z-index: 2147483647;
-    box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.4);
-    border-radius: 8px;
-    background-color: #ffffff;
-    padding: 8px;
+    box-shadow: var(--shadow-floating);
+    border-radius: var(--rounded);
+    background-color: var(--color-0-floating);
+    padding: var(--px-2);
     width: 40%;
     max-height: 50%;
     overflow: hidden;
@@ -297,8 +307,8 @@ t-root {
       display: flex;
       flex: 1;
       flex-direction: column;
-      gap: 8px;
-      padding-right: 8px;
+      gap: var(--px-2);
+      padding-right: var(--px-2);
       width: 100%;
       overflow-x: hidden;
       overflow-y: auto;
@@ -308,17 +318,21 @@ t-root {
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        gap: 4px;
+        gap: var(--px-1);
         cursor: pointer;
-        border-radius: 4px;
-        padding: 8px;
+        border-radius: var(--rounded);
+        padding: var(--px-2);
         width: 100%;
         max-height: 300px;
-        color: #333333;
         font-weight: bold;
-        font-size: 18px;
+        > t-size {
+          color: var(--color-font);
+        }
         &:hover {
-          background-color: #dedede;
+          background-color: var(--color-2);
+        }
+        &:active {
+          background-color: var(--color-accent-1);
         }
         &.saved {
           opacity: 0.5;
@@ -326,7 +340,7 @@ t-root {
         &.save {
           > img {
             display: block;
-            border-radius: 4px;
+            border-radius: var(--rounded);
             background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAADNJREFUOI1jvHz58n8GPEBHRwefNAMTXlkiwKgBg8EAxv///+NNB1euXKGtC0YNGAwGAAAfVwqTIQ+HUgAAAABJRU5ErkJggg==);
             max-width: 100%;
             height: auto;
