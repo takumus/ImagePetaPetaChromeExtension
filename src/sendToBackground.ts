@@ -16,7 +16,7 @@ export function sendToBackground<U extends keyof MessagesToBackground>(
         },
       );
     } catch (err) {
-      // rej(err);
+      rej(err);
     }
   }) as any;
 }

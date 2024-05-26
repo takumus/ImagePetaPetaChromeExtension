@@ -1,38 +1,42 @@
 <template>
   <e-window-root v-show="show">
-    <t-menu
+    <e-menu
       ref="menu"
       :style="{
         left: menuPosition.x + 'px',
         top: menuPosition.y + 'px',
       }">
-      <t-buttons>
-        <t-button
+      <e-icon>
+        <img :src="icon" />
+        <e-label>ImagePetaPeta</e-label>
+      </e-icon>
+      <e-buttons>
+        <e-button
           class="save"
           v-for="url in urls"
           @click="save(url)"
           :class="{
             [savedURLs[url]]: true,
           }">
-          <t-size>{{ imgInfo[url]?.width }}x{{ imgInfo[url]?.height }}</t-size>
+          <e-size>{{ imgInfo[url]?.width }}x{{ imgInfo[url]?.height }}</e-size>
           <img
             :src="url"
             v-show="imgInfo[url]?.loaded"
             @load="setImageInfo($event.target as HTMLImageElement)" />
-        </t-button>
-      </t-buttons>
-    </t-menu>
-    <t-boxes>
-      <t-box
+        </e-button>
+      </e-buttons>
+    </e-menu>
+    <e-boxes>
+      <e-box
         v-for="ipr in currentImageParseResult"
         :style="{
           top: ipr.rect.y + 'px',
           left: ipr.rect.x + 'px',
           width: ipr.rect.width + 'px',
           height: ipr.rect.height + 'px',
-        }"></t-box>
-    </t-boxes>
-    <t-background></t-background>
+        }"></e-box>
+    </e-boxes>
+    <e-background></e-background>
   </e-window-root>
 </template>
 <script setup lang="ts">
@@ -41,6 +45,7 @@ import { inject, onMounted, ref } from "vue";
 
 import { getData, ImageParserResult } from "@/scripts/content/imageParser";
 import { injectedDataStoreKey } from "@/scripts/content/injectedData";
+import { icon, subIcon } from "@/scripts/icon";
 
 import { MessagesToContent } from "@/messages";
 import { sendToBackground } from "@/sendToBackground";
@@ -144,7 +149,6 @@ onMounted(() => {
       }
     }).observe(menu.value);
   }
-  setInterval(async () => (enabledRightClick = await sendToBackground("getRightClickEnable")), 100);
   // overlay.captureButton.addEventListener("click", async () => {
   //   overlay.setStatus("saving");
   //   const domRect = clickedElement?.rect;
@@ -225,14 +229,27 @@ onMounted(() => {
       select(mousePosition.value.x, mousePosition.value.y);
     },
   };
-  chrome.runtime.onMessage.addListener((request, _, response) => {
-    (messageFunctions as any)[request.type](...request.args).then((res: any) => {
-      response({
-        value: res,
-      });
+  if (injectedData.id === "dev") {
+    (window.document.querySelector("#img1") as HTMLImageElement).src = icon;
+    (window.document.querySelector("#img2") as HTMLImageElement).src = icon;
+    (window.document.querySelector("#img3") as HTMLImageElement).src = subIcon;
+    window.document.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+      messageFunctions.openMenu();
     });
-    return true;
-  });
+  } else {
+    setInterval(async () => {
+      enabledRightClick = await sendToBackground("getRightClickEnable");
+    }, 100);
+    chrome.runtime.onMessage.addListener((request, _, response) => {
+      (messageFunctions as any)[request.type](...request.args).then((res: any) => {
+        response({
+          value: res,
+        });
+      });
+      return true;
+    });
+  }
 });
 </script>
 <style lang="scss">
@@ -262,7 +279,7 @@ e-window-root {
   background-color: unset !important;
   width: 0px !important;
   height: 0px !important;
-  > t-boxes > t-box {
+  > e-boxes > e-box {
     position: fixed;
     top: 0px;
     left: 0px;
@@ -280,7 +297,7 @@ e-window-root {
     height: 100%;
     pointer-events: none;
   }
-  > t-background {
+  > e-background {
     position: fixed;
     top: 0px;
     left: 0px;
@@ -290,11 +307,13 @@ e-window-root {
     height: 100%;
     pointer-events: none;
   }
-  > t-menu {
+  > e-menu {
     display: flex;
     position: fixed;
     flex-direction: column;
     align-items: center;
+    gap: var(--px-2);
+    opacity: 0.9;
     z-index: 2147483647;
     box-shadow: var(--shadow-floating);
     border-radius: var(--rounded);
@@ -304,17 +323,33 @@ e-window-root {
     max-height: 50%;
     overflow: hidden;
     pointer-events: auto;
-    > t-buttons {
+    > e-icon {
+      display: flex;
+      flex-direction: row;
+      justify-content: left;
+      align-items: center;
+      gap: var(--px-2);
+      width: 100%;
+      height: 32px;
+      > e-label {
+        color: var(--color-font);
+      }
+      > img {
+        display: block;
+        height: 100%;
+      }
+    }
+    > e-buttons {
       display: flex;
       flex: 1;
       flex-direction: column;
       gap: var(--px-2);
       padding-right: var(--px-2);
       width: 100%;
-      overflow-x: hidden;
+      overflow: hidden;
       overflow-y: auto;
       pointer-events: auto !important;
-      > t-button {
+      > e-button {
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -326,7 +361,7 @@ e-window-root {
         width: 100%;
         max-height: 300px;
         font-weight: bold;
-        > t-size {
+        > e-size {
           color: var(--color-font);
         }
         &:hover {

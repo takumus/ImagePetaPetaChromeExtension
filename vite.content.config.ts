@@ -8,7 +8,7 @@ export default defineConfig({
   publicDir: resolve("./src/content/public"),
   base: "./",
   build: {
-    emptyOutDir: true,
+    emptyOutDir: !process.argv.includes("--dev"),
     outDir: resolve("./dist/content"),
     minify: false,
     rollupOptions: {
