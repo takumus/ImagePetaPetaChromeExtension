@@ -33,10 +33,10 @@
   </e-window-root>
 </template>
 <script setup lang="ts">
-import { urlDrivers } from "./drivers";
-import VBoxes from "./VBoxes.vue";
 import { inject, onMounted, ref } from "vue";
 
+import VBoxes from "@/scripts/content/components/VBoxes.vue";
+import { urlDrivers } from "@/scripts/content/drivers";
 import { getImageExtension } from "@/scripts/content/getImageExtension";
 import { getData, ImageParserResult } from "@/scripts/content/imageParser";
 import { injectedDataStoreKey } from "@/scripts/content/injectedData";
