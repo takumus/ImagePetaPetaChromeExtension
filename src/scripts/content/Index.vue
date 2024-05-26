@@ -18,7 +18,7 @@
           <img
             :src="url"
             v-show="imgInfo[url]?.loaded"
-            @load="(e) => setImageInfo(url, e.target as HTMLImageElement)" />
+            @load="setImageInfo($event.target as HTMLImageElement)" />
         </t-button>
       </t-buttons>
     </t-menu>
@@ -60,9 +60,9 @@ if (injectedData === undefined) {
   throw "impt inject error";
 }
 let currentImageParseResult = ref<ImageParserResult[]>([]);
-function setImageInfo(url: string, element: HTMLImageElement) {
-  if (imgInfo.value[url] !== undefined) {
-    imgInfo.value[url] = {
+function setImageInfo(element: HTMLImageElement) {
+  if (imgInfo.value[element.src] !== undefined) {
+    imgInfo.value[element.src] = {
       width: element.naturalWidth,
       height: element.naturalHeight,
       loaded: true,
