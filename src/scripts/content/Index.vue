@@ -18,7 +18,9 @@
           :class="{
             [savedURLs[url]]: true,
           }">
-          <e-size>{{ imgInfo[url]?.width }}x{{ imgInfo[url]?.height }}</e-size>
+          <e-size>
+            {{ imgInfo[url]?.type }}({{ imgInfo[url]?.width }}x{{ imgInfo[url]?.height }})</e-size
+          >
           <img
             :src="url"
             v-show="imgInfo[url]?.loaded"
@@ -36,13 +38,14 @@
           height: ipr.rect.height + 'px',
         }"></e-box>
     </e-boxes>
-    <e-background></e-background>
+    <e-background ref="background"></e-background>
   </e-window-root>
 </template>
 <script setup lang="ts">
 import { urlDrivers } from "./drivers";
 import { inject, onMounted, ref } from "vue";
 
+import { getImageExtension } from "@/scripts/content/getImageExtension";
 import { getData, ImageParserResult } from "@/scripts/content/imageParser";
 import { injectedDataStoreKey } from "@/scripts/content/injectedData";
 import { icon, subIcon } from "@/scripts/icon";
@@ -50,11 +53,12 @@ import { icon, subIcon } from "@/scripts/icon";
 import { MessagesToContent } from "@/messages";
 import { sendToBackground } from "@/sendToBackground";
 
-type ImageInfo = { width: number; height: number; loaded: boolean };
+type ImageInfo = { width: number; height: number; loaded: boolean; type: string };
 type SaveState = "saving" | "saved" | "failed";
 const urls = ref<string[]>([]);
 const imgInfo = ref<{ [url: string]: ImageInfo | undefined }>({});
 const show = ref(false);
+const background = ref<HTMLElement>();
 const menu = ref<HTMLElement>();
 const menuPosition = ref({ x: 0, y: 0 });
 const menuTargetPosition = ref({ x: 0, y: 0 });
@@ -68,9 +72,11 @@ let currentImageParseResult = ref<ImageParserResult[]>([]);
 function setImageInfo(element: HTMLImageElement) {
   if (imgInfo.value[element.src] !== undefined) {
     imgInfo.value[element.src] = {
+      ...imgInfo.value[element.src],
       width: element.naturalWidth,
       height: element.naturalHeight,
       loaded: true,
+      type: getImageExtension(element.src) ?? "unknown",
     };
   }
 }
@@ -96,7 +102,7 @@ async function select(x: number, y: number) {
   );
   imgInfo.value = urls.value.reduce<{ [url: string]: ImageInfo }>((p, c) => {
     return {
-      [c]: imgInfo.value[c] ?? { width: 0, height: 0, loaded: false },
+      [c]: imgInfo.value[c] ?? { width: 0, height: 0, loaded: false, type: "unknown" },
       ...p,
     };
   }, {});
@@ -209,17 +215,7 @@ onMounted(() => {
     },
     true,
   );
-  window.document.addEventListener(
-    "pointerdown",
-    (event) => {
-      if (event.target === injectedData.domRoot) {
-        event.preventDefault();
-        return;
-      }
-      hide();
-    },
-    true,
-  );
+  background.value?.addEventListener("click", hide);
   window.document.addEventListener("mousemove", (event) => {
     mousePosition.value.x = event.clientX;
     mousePosition.value.y = event.clientY;
@@ -232,7 +228,8 @@ onMounted(() => {
   if (injectedData.id === "dev") {
     (window.document.querySelector("#img1") as HTMLImageElement).src = icon;
     (window.document.querySelector("#img2") as HTMLImageElement).src = icon;
-    (window.document.querySelector("#img3") as HTMLImageElement).src = subIcon;
+    (window.document.querySelector("#img3") as HTMLImageElement).style.backgroundImage =
+      `url(${subIcon})`;
     window.document.addEventListener("contextmenu", (e) => {
       e.preventDefault();
       messageFunctions.openMenu();
@@ -262,6 +259,7 @@ onMounted(() => {
   line-height: 16px;
   font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo,
     sans-serif;
+  user-select: none;
 }
 *::-webkit-scrollbar {
   width: var(--px-2);
@@ -305,7 +303,6 @@ e-window-root {
     background-color: var(--color-overlay);
     width: 100%;
     height: 100%;
-    pointer-events: none;
   }
   > e-menu {
     display: flex;
@@ -313,7 +310,7 @@ e-window-root {
     flex-direction: column;
     align-items: center;
     gap: var(--px-2);
-    opacity: 0.9;
+    opacity: 0.95;
     z-index: 2147483647;
     box-shadow: var(--shadow-floating);
     border-radius: var(--rounded);
