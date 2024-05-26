@@ -7,7 +7,13 @@
         top: menuPosition.y + 'px',
       }">
       <t-buttons>
-        <t-button class="save" v-for="url in urls" @click="save(url)">
+        <t-button
+          class="save"
+          v-for="url in urls"
+          @click="save(url)"
+          :class="{
+            [savedURLs[url]]: true,
+          }">
           <t-size>{{ imgInfo[url]?.width }}x{{ imgInfo[url]?.height }}</t-size>
           <img
             :src="url"
@@ -45,6 +51,7 @@ import { MessagesToContent } from "@/messages";
 import { sendToBackground } from "@/sendToBackground";
 
 type ImageInfo = { width: number; height: number; loaded: boolean };
+type SaveState = "saving" | "saved" | "failed";
 const urls = ref<string[]>([]);
 const imgInfo = ref<{ [url: string]: ImageInfo | undefined }>({});
 const show = ref(false);
@@ -53,6 +60,7 @@ const menuPosition = ref({ x: 0, y: 0 });
 const menuTargetPosition = ref({ x: 0, y: 0 });
 const mousePosition = ref({ x: 0, y: 0 });
 const injectedData = inject(injectedDataStoreKey);
+const savedURLs = ref<{ [url: string]: SaveState }>({});
 if (injectedData === undefined) {
   throw "impt inject error";
 }
@@ -64,7 +72,9 @@ async function save(url: string) {
     note: location.href,
   });
   const result = await sendToBackground("save");
-  console.log(result);
+  if (result !== undefined && result.length > 0) {
+    savedURLs.value[url] = "saved";
+  }
 }
 function setSize(url: string, info: ImageInfo) {
   if (imgInfo.value[url]) {
@@ -88,7 +98,7 @@ async function select(x: number, y: number) {
   }, {});
   console.log(currentImageParseResult.value);
   if (currentImageParseResult.value.length === 0) {
-    show.value = false;
+    hide();
     return;
   }
   show.value = true;
@@ -114,6 +124,10 @@ function updateMenuPosition(optionalRect?: DOMRect) {
     }
     menuPosition.value = { x, y };
   }
+}
+function hide() {
+  show.value = false;
+  savedURLs.value = {};
 }
 onMounted(() => {
   let enabledRightClick = false;
@@ -199,7 +213,7 @@ onMounted(() => {
         event.preventDefault();
         return;
       }
-      show.value = false;
+      hide();
     },
     true,
   );
@@ -306,6 +320,9 @@ t-root {
         font-size: 18px;
         &:hover {
           background-color: #dedede;
+        }
+        &.saved {
+          opacity: 0.5;
         }
         &.save {
           > img {
