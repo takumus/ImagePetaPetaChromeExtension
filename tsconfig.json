@@ -19,6 +19,6 @@
       ],
     },
   },
-  "include": ["vite.scripts.config.ts", "vite.popup.config.ts", "package.json", "src"],
+  "include": ["vite.scripts.config.ts", "vite.popup.config.ts", "package.json", "src", "scripts"],
   "references": []
 }

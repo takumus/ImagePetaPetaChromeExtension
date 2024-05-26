@@ -22,7 +22,7 @@
 import VImageButtons from "./VImageButtons.vue";
 import { inject, onMounted, ref } from "vue";
 
-import { ImageInfo, ImageInfoSaveState } from "@/content/components/imageInfo";
+import { ImageInfo } from "@/@types/imageInfo";
 import VBoxes from "@/content/components/VBoxes.vue";
 import { urlDrivers } from "@/content/drivers";
 import { getData, ImageParserResult } from "@/content/imageParser";
