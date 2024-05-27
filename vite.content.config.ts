@@ -1,4 +1,4 @@
-import { resolve } from "path";
+import { extname, resolve } from "path";
 import vue from "@vitejs/plugin-vue";
 import { defineConfig } from "vite";
 
@@ -17,6 +17,19 @@ export default defineConfig({
         chunkFileNames: `assets/[name].js`,
         assetFileNames: `assets/[name].[ext]`,
       },
+      plugins: [
+        {
+          name: "wrap-in-iife",
+          generateBundle(outputOptions, bundle) {
+            Object.keys(bundle).forEach((fileName) => {
+              const file = bundle[fileName];
+              if (extname(fileName) === ".js" && "code" in file) {
+                file.code = `// (;o;)\n(() => {\n${file.code}})();`;
+              }
+            });
+          },
+        },
+      ],
     },
   },
   resolve: {
