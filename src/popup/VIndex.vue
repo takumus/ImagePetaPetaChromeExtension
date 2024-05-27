@@ -1,16 +1,13 @@
 <template>
   <e-window-root>
     <label>
-      <VCheckbox v-model:value="enabled" />
       <button @click="saveAll">Save All</button>
     </label>
   </e-window-root>
 </template>
 <script setup lang="ts">
-import VCheckbox from "imagepetapeta-beta/src/renderer/components/commons/utils/checkbox/VCheckbox.vue";
 import { onMounted, ref, watch } from "vue";
 
-import { icon } from "@/icon";
 import { sendToBackground } from "@/sendToBackground";
 
 const enabled = ref(false);
