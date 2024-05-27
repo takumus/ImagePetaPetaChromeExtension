@@ -207,7 +207,7 @@ onMounted(() => {
     });
   } else {
     setInterval(async () => {
-      enabledRightClick = await sendToBackground("getRightClickEnable");
+      // enabledRightClick = await sendToBackground("getRightClickEnable");
     }, 100);
     chrome.runtime.onMessage.addListener((request, _, response) => {
       (messageFunctions as any)[request.type](...request.args).then((res: any) => {

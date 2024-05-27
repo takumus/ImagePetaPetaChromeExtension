@@ -122,6 +122,12 @@ const messageFunctions: MessagesToBackgroundType = {
   async clearImageURLs(event) {
     //
   },
+  async saveAll(event) {
+    const tab = await getCurrentTab();
+    if (tab?.id !== undefined) {
+      saveAll(tab.id);
+    }
+  },
 };
 async function inject(tabId: number) {
   try {
@@ -166,6 +172,14 @@ async function inject(tabId: number) {
     //
   }
 }
+async function saveAll(tabId: number) {
+  console.log("GAI");
+  if (!(await checkApp())) {
+    return undefined;
+  }
+  await sendToApp("openDownloadSelector", []);
+  await sendToContent(tabId, "requestImageURLs");
+}
 chrome.tabs.onActivated.addListener((info) => {
   inject(info.tabId);
 });
@@ -203,12 +217,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
       break;
     case "getAllImage":
       if (tab?.id !== undefined) {
-        console.log("GAI");
-        if (!(await checkApp())) {
-          return undefined;
-        }
-        await sendToApp("openDownloadSelector", []);
-        await sendToContent(tab.id, "requestImageURLs");
+        saveAll(tab.id);
       }
       break;
   }

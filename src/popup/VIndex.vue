@@ -1,10 +1,10 @@
 <template>
-  <e-root>
-    <img :src="icon" />
+  <e-window-root>
     <label>
       <VCheckbox v-model:value="enabled" />
+      <button @click="saveAll">Save All</button>
     </label>
-  </e-root>
+  </e-window-root>
 </template>
 <script setup lang="ts">
 import VCheckbox from "imagepetapeta-beta/src/renderer/components/commons/utils/checkbox/VCheckbox.vue";
@@ -14,6 +14,9 @@ import { icon } from "@/icon";
 import { sendToBackground } from "@/sendToBackground";
 
 const enabled = ref(false);
+function saveAll() {
+  sendToBackground("saveAll");
+}
 onMounted(async () => {
   enabled.value = await sendToBackground("getRightClickEnable");
 });
@@ -32,7 +35,8 @@ html {
   margin: 0px;
   background-color: var(--color-0);
   padding: 0px;
-  min-width: 100px;
+  min-width: 300px;
+  min-height: 300px;
   color: var(--color-font);
   font-size: 12px;
   line-height: 12px;
@@ -46,7 +50,7 @@ label {
   align-items: center;
   gap: var(--size-1);
 }
-e-root {
+e-window-root {
   display: flex;
   flex-direction: column;
   padding: 8px;

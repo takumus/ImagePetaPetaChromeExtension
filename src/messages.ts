@@ -23,6 +23,7 @@ export interface MessagesToBackground {
   getInjectId: () => Promise<string>;
   clearImageURLs: () => Promise<void>;
   addImageURLs: (urls: DownloadSelectorData) => Promise<void>;
+  saveAll: () => Promise<void>;
 }
 export interface MessagesToContent {
   openMenu: () => Promise<void>;
