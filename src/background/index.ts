@@ -116,8 +116,9 @@ const messageFunctions: MessagesToBackgroundType = {
   async getInjectId() {
     return injectId;
   },
-  async addImageURLs(_event, urls, pageURL) {
-    console.log(pageURL, urls);
+  async addImageURLs(_event, urls) {
+    console.log(urls);
+    sendToApp("addDownloadSelectorURLs", [urls]);
   },
   async clearImageURLs(event) {
     //
@@ -205,6 +206,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
       if (tab?.id !== undefined) {
         console.log("GAI");
         sendToContent(tab.id, "requestImageURLs");
+        sendToApp("openDownloadSelector", []);
       }
       break;
   }

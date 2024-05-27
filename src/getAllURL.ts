@@ -8,17 +8,18 @@ const messageFunctions: MessagesToContent = {
     //
   },
   requestImageURLs: async () => {
-    sendToBackground(
-      "addImageURLs",
-      Array.from(
+    sendToBackground("addImageURLs", {
+      urls: Array.from(
         new Set(
           getData()
             .map((d) => d.urls)
             .reduce<string[]>((p, c) => [...p, ...c], []),
         ),
       ),
-      location.href,
-    );
+      referer: location.origin,
+      pageURL: location.href,
+      pageTitle: document.title,
+    });
   },
 };
 chrome.runtime.onMessage.addListener((request, _, response) => {

@@ -1,3 +1,4 @@
+import { DownloadSelectorData } from "imagepetapeta-beta/src/commons/datas/downloadSelectorData";
 import { ImportFileAdditionalData } from "imagepetapeta-beta/src/commons/datas/importFileGroup";
 
 export interface MessagesToBackground {
@@ -21,7 +22,7 @@ export interface MessagesToBackground {
   getRightClickEnable: () => Promise<boolean>;
   getInjectId: () => Promise<string>;
   clearImageURLs: () => Promise<void>;
-  addImageURLs: (urls: string[], pageURL: string) => Promise<void>;
+  addImageURLs: (urls: DownloadSelectorData) => Promise<void>;
 }
 export interface MessagesToContent {
   openMenu: () => Promise<void>;
