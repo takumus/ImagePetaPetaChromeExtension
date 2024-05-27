@@ -1,5 +1,5 @@
-import { DownloadSelectorData } from "imagepetapeta-beta/src/commons/datas/downloadSelectorData";
 import { ImportFileAdditionalData } from "imagepetapeta-beta/src/commons/datas/importFileGroup";
+import { PageDownloaderData } from "imagepetapeta-beta/src/commons/datas/pageDownloaderData";
 
 export interface MessagesToBackground {
   orderSave: (
@@ -22,7 +22,7 @@ export interface MessagesToBackground {
   getRightClickEnable: () => Promise<boolean>;
   getInjectId: () => Promise<string>;
   clearImageURLs: () => Promise<void>;
-  addImageURLs: (urls: DownloadSelectorData) => Promise<void>;
+  addImageURLs: (urls: PageDownloaderData) => Promise<void>;
   saveAll: () => Promise<void>;
 }
 export interface MessagesToContent {

@@ -117,7 +117,7 @@ const messageFunctions: MessagesToBackgroundType = {
     return injectId;
   },
   async addImageURLs(_event, urls) {
-    await sendToApp("addDownloadSelectorURLs", [urls]);
+    await sendToApp("addPageDownloaderDatas", [urls]);
   },
   async clearImageURLs(event) {
     //
@@ -177,7 +177,7 @@ async function saveAll(tabId: number) {
   if (!(await checkApp())) {
     return undefined;
   }
-  await sendToApp("openDownloadSelector", []);
+  await sendToApp("openPageDownloader", []);
   await sendToContent(tabId, "requestImageURLs");
 }
 chrome.tabs.onActivated.addListener((info) => {
