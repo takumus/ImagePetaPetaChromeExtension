@@ -16,5 +16,5 @@ export async function sendToApp<U extends keyof IpcFunctions>(
       args,
     }),
   });
-  return response.json();
+  return (await response.json()).response;
 }

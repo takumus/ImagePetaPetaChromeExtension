@@ -117,8 +117,7 @@ const messageFunctions: MessagesToBackgroundType = {
     return injectId;
   },
   async addImageURLs(_event, urls) {
-    console.log(urls);
-    sendToApp("addDownloadSelectorURLs", [urls]);
+    await sendToApp("addDownloadSelectorURLs", [urls]);
   },
   async clearImageURLs(event) {
     //
@@ -195,7 +194,7 @@ chrome.commands.onCommand.addListener(async (command, tab) => {
       break;
   }
 });
-chrome.contextMenus.onClicked.addListener((info, tab) => {
+chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   switch (info.menuItemId) {
     case "saveImage":
       if (tab?.id !== undefined) {
@@ -205,8 +204,11 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     case "getAllImage":
       if (tab?.id !== undefined) {
         console.log("GAI");
-        sendToContent(tab.id, "requestImageURLs");
-        sendToApp("openDownloadSelector", []);
+        if (!(await checkApp())) {
+          return undefined;
+        }
+        await sendToApp("openDownloadSelector", []);
+        await sendToContent(tab.id, "requestImageURLs");
       }
       break;
   }
