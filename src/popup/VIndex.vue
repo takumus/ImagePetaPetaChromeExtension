@@ -1,8 +1,7 @@
 <template>
   <e-window-root>
-    <label>
-      <button @click="saveAll">Save All</button>
-    </label>
+    <button @click="requestPageDownloaderDatas(true)">Download Page (view)</button>
+    <button @click="requestPageDownloaderDatas(false)">Download Page (all)</button>
   </e-window-root>
 </template>
 <script setup lang="ts">
@@ -11,8 +10,8 @@ import { onMounted, ref, watch } from "vue";
 import { sendToBackground } from "@/sendToBackground";
 
 const enabled = ref(false);
-function saveAll() {
-  sendToBackground("saveAll");
+function requestPageDownloaderDatas(inView: boolean) {
+  sendToBackground("requestPageDownloaderDatas", inView);
 }
 onMounted(async () => {
   enabled.value = await sendToBackground("getRightClickEnable");

@@ -116,16 +116,16 @@ const messageFunctions: MessagesToBackgroundType = {
   async getInjectId() {
     return injectId;
   },
-  async addImageURLs(_event, urls) {
+  async addPageDownloaderDatas(_event, urls) {
     await sendToApp("addPageDownloaderDatas", [urls]);
   },
   async clearImageURLs(event) {
     //
   },
-  async saveAll(event) {
+  async requestPageDownloaderDatas(event, inView) {
     const tab = await getCurrentTab();
     if (tab?.id !== undefined) {
-      saveAll(tab.id);
+      requestPageDownloaderDatas(tab.id, inView);
     }
   },
 };
@@ -172,13 +172,13 @@ async function inject(tabId: number) {
     //
   }
 }
-async function saveAll(tabId: number) {
+async function requestPageDownloaderDatas(tabId: number, inView: boolean) {
   console.log("GAI");
   if (!(await checkApp())) {
     return undefined;
   }
   await sendToApp("openPageDownloader", []);
-  await sendToContent(tabId, "requestImageURLs");
+  await sendToContent(tabId, "requestPageDownloaderDatas", inView);
 }
 chrome.tabs.onActivated.addListener((info) => {
   inject(info.tabId);
@@ -215,9 +215,14 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
         sendToContent(tab.id, "openMenu");
       }
       break;
-    case "getAllImage":
+    case "downloadPageView":
       if (tab?.id !== undefined) {
-        saveAll(tab.id);
+        requestPageDownloaderDatas(tab.id, true);
+      }
+      break;
+    case "downloadPageAll":
+      if (tab?.id !== undefined) {
+        requestPageDownloaderDatas(tab.id, false);
       }
       break;
   }
@@ -229,9 +234,14 @@ chrome.runtime.onInstalled.addListener(() => {
     title: "Save Images",
   });
   chrome.contextMenus.create({
-    id: "getAllImage",
+    id: "downloadPageView",
     contexts: ["all"],
-    title: "Get All Images",
+    title: "Download Page (view)",
+  });
+  chrome.contextMenus.create({
+    id: "downloadPageAll",
+    contexts: ["all"],
+    title: "Download Page (all)",
   });
 });
 

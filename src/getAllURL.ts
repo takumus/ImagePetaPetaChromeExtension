@@ -7,11 +7,15 @@ const messageFunctions: MessagesToContent = {
   openMenu: async () => {
     //
   },
-  requestImageURLs: async () => {
-    sendToBackground("addImageURLs", {
+  requestPageDownloaderDatas: async (inView) => {
+    sendToBackground("addPageDownloaderDatas", {
       urls: Array.from(
         new Set(
-          getData()
+          getData(
+            inView
+              ? { x: 0, y: 0, width: window.innerWidth, height: window.innerHeight }
+              : undefined,
+          )
             .map((d) => d.urls)
             .reduce<string[]>((p, c) => [...p, ...c], []),
         ),

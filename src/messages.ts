@@ -22,10 +22,10 @@ export interface MessagesToBackground {
   getRightClickEnable: () => Promise<boolean>;
   getInjectId: () => Promise<string>;
   clearImageURLs: () => Promise<void>;
-  addImageURLs: (urls: PageDownloaderData) => Promise<void>;
-  saveAll: () => Promise<void>;
+  addPageDownloaderDatas: (urls: PageDownloaderData) => Promise<void>;
+  requestPageDownloaderDatas: (inView: boolean) => Promise<void>;
 }
 export interface MessagesToContent {
   openMenu: () => Promise<void>;
-  requestImageURLs: () => Promise<void>;
+  requestPageDownloaderDatas: (inView: boolean) => Promise<void>;
 }

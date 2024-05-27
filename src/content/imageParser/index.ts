@@ -8,7 +8,9 @@ export interface ImageParserResult {
   depth: number;
 }
 
-export function getData(pointer?: { x: number; y: number }) {
+export function getData(
+  hitArea?: { x: number; y: number } | { x: number; y: number; width: number; height: number },
+) {
   const elements = Array.from(document.querySelectorAll("*")) as HTMLElement[];
   function getDepth(element: HTMLElement) {
     let parent: HTMLElement | null = element.parentElement;
@@ -29,11 +31,14 @@ export function getData(pointer?: { x: number; y: number }) {
     .filter((res) => {
       const rect = res.rect;
       const isInRect =
-        pointer !== undefined
-          ? rect.left < pointer.x &&
-            rect.right > pointer.x &&
-            rect.top < pointer.y &&
-            rect.bottom > pointer.y
+        hitArea !== undefined
+          ? "width" in hitArea
+            ? Math.abs(rect.x + rect.width / 2 - (hitArea.x + hitArea.width / 2)) <
+                rect.width / 2 + hitArea.width / 2 &&
+              Math.abs(rect.y + rect.height / 2 - (hitArea.y + hitArea.height / 2)) <
+                rect.height / 2 + hitArea.height / 2
+            : Math.abs(rect.x + rect.width / 2 - hitArea.x) < rect.width / 2 &&
+              Math.abs(rect.y + rect.height / 2 - hitArea.y) < rect.height / 2
           : true;
       const hasURL = res.urls.length > 0;
       return isInRect && hasURL;

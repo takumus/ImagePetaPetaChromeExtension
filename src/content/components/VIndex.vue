@@ -192,7 +192,7 @@ onMounted(() => {
     openMenu: async () => {
       select(mousePosition.value.x, mousePosition.value.y);
     },
-    requestImageURLs: async () => {
+    requestPageDownloaderDatas: async () => {
       //
     },
   };
