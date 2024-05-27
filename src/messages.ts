@@ -20,7 +20,10 @@ export interface MessagesToBackground {
   setRightClickEnable: (value: boolean) => Promise<void>;
   getRightClickEnable: () => Promise<boolean>;
   getInjectId: () => Promise<string>;
+  clearImageURLs: () => Promise<void>;
+  addImageURLs: (urls: string[], pageURL: string) => Promise<void>;
 }
 export interface MessagesToContent {
   openMenu: () => Promise<void>;
+  requestImageURLs: () => Promise<void>;
 }

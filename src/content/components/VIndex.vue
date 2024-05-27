@@ -24,7 +24,6 @@ import { inject, onMounted, ref } from "vue";
 
 import { ImageInfo } from "@/@types/imageInfo";
 import VBoxes from "@/content/components/VBoxes.vue";
-import { urlDrivers } from "@/content/drivers";
 import { getData, ImageParserResult } from "@/content/imageParser";
 import { injectedDataStoreKey } from "@/content/injectedData";
 import { icon, subIcon } from "@/icon";
@@ -60,10 +59,7 @@ async function save(url: string) {
 }
 async function select(x: number, y: number) {
   menuTargetPosition.value = { x, y };
-  currentImageParseResult.value = getData({ x, y }).map((d) => {
-    d.urls = urlDrivers.reduce<string[]>((urls, driver) => driver(urls), d.urls);
-    return d;
-  });
+  currentImageParseResult.value = getData({ x, y });
   urls.value = Array.from(
     new Set(currentImageParseResult.value.reduce<string[]>((p, c) => [...c.urls, ...p], [])),
   );
@@ -196,6 +192,9 @@ onMounted(() => {
     openMenu: async () => {
       select(mousePosition.value.x, mousePosition.value.y);
     },
+    requestImageURLs: async () => {
+      //
+    },
   };
   if (injectedData.id === "dev") {
     (window.document.querySelector("#img1") as HTMLImageElement).src = icon;
@@ -271,7 +270,7 @@ e-window-root {
     background-color: var(--color-0-floating);
     padding: var(--px-2);
     width: 40%;
-    max-height: 50%;
+    height: 50%;
     overflow: hidden;
     pointer-events: auto;
     > e-icon {

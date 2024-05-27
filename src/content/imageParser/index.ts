@@ -1,3 +1,4 @@
+import { transFormURLs } from "@/content/drivers";
 import { getURLsFromElement } from "@/content/imageParser/getURLsFromElement";
 
 export interface ImageParserResult {
@@ -7,7 +8,7 @@ export interface ImageParserResult {
   depth: number;
 }
 
-export function getData(pointer: { x: number; y: number }) {
+export function getData(pointer?: { x: number; y: number }) {
   const elements = Array.from(document.querySelectorAll("*")) as HTMLElement[];
   function getDepth(element: HTMLElement) {
     let parent: HTMLElement | null = element.parentElement;
@@ -22,16 +23,18 @@ export function getData(pointer: { x: number; y: number }) {
     .map((element) => ({
       element,
       rect: element.getBoundingClientRect(),
-      urls: getURLsFromElement(element),
+      urls: transFormURLs(getURLsFromElement(element)),
       depth: getDepth(element),
     }))
     .filter((res) => {
       const rect = res.rect;
       const isInRect =
-        rect.left < pointer.x &&
-        rect.right > pointer.x &&
-        rect.top < pointer.y &&
-        rect.bottom > pointer.y;
+        pointer !== undefined
+          ? rect.left < pointer.x &&
+            rect.right > pointer.x &&
+            rect.top < pointer.y &&
+            rect.bottom > pointer.y
+          : true;
       const hasURL = res.urls.length > 0;
       return isInRect && hasURL;
     })

@@ -36,4 +36,12 @@ export const manifest: chrome.runtime.Manifest = {
       description: "Reload",
     },
   },
+  content_scripts: [
+    {
+      matches: ["<all_urls>"],
+      js: ["getAllURL.mjs"],
+      run_at: "document_end",
+      all_frames: true,
+    },
+  ],
 };

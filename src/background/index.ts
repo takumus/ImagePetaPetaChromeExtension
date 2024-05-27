@@ -116,6 +116,12 @@ const messageFunctions: MessagesToBackgroundType = {
   async getInjectId() {
     return injectId;
   },
+  async addImageURLs(_event, urls, pageURL) {
+    console.log(pageURL, urls);
+  },
+  async clearImageURLs(event) {
+    //
+  },
 };
 async function inject(tabId: number) {
   try {
@@ -195,6 +201,12 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
         sendToContent(tab.id, "openMenu");
       }
       break;
+    case "getAllImage":
+      if (tab?.id !== undefined) {
+        console.log("GAI");
+        sendToContent(tab.id, "requestImageURLs");
+      }
+      break;
   }
 });
 chrome.runtime.onInstalled.addListener(() => {
@@ -202,6 +214,11 @@ chrome.runtime.onInstalled.addListener(() => {
     id: "saveImage",
     contexts: ["all"],
     title: "Save Images",
+  });
+  chrome.contextMenus.create({
+    id: "getAllImage",
+    contexts: ["all"],
+    title: "Get All Images",
   });
 });
 
