@@ -3,7 +3,8 @@ import keypress from "keypress";
 import kill from "tree-kill";
 
 const childProcesses = [
-  spawn("npm", ["run", "dev:scripts"]),
+  spawn("npm", ["run", "dev:background"]),
+  spawn("npm", ["run", "dev:get-all-url"]),
   spawn("npm", ["run", "dev:popup"]),
   spawn("npm", ["run", "dev:ui"]),
   spawn("npm", ["run", "dev:manifest"]),

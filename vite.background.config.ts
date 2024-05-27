@@ -12,7 +12,6 @@ export default defineConfig({
     lib: {
       entry: {
         background: resolve("./src/background/index.ts"),
-        getAllURL: resolve("./src/getAllURL.ts"),
       },
       formats: ["es"],
       // fileName: "background",

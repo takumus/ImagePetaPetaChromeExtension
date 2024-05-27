@@ -39,7 +39,7 @@ export const manifest: chrome.runtime.Manifest = {
   content_scripts: [
     {
       matches: ["<all_urls>"],
-      js: ["getAllURL.mjs"],
+      js: ["getAllURL.js"],
       run_at: "document_end",
       all_frames: true,
     },
