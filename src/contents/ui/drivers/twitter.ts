@@ -4,5 +4,9 @@ export function twitter(urls: string[]) {
     return urls;
   }
   console.log("twitter driver");
-  return [url.replace(/&name=[^&]*/, "&name=large"), ...urls];
+  return [
+    url.replace(/&name=[^&]*/, "&name=4096x4096"),
+    url.replace(/&name=[^&]*/, "&name=large"),
+    ...urls,
+  ];
 }
