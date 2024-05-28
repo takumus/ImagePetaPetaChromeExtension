@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from "vue";
 
-import { sendToBackground } from "@/sendToBackground";
+import { sendToBackground } from "@/commons/sendToBackground";
 
 const enabled = ref(false);
 function requestPageDownloaderDatas(inView: boolean) {

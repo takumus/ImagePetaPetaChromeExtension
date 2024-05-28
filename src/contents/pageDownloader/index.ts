@@ -1,6 +1,6 @@
+import { sendToBackground } from "@/commons/sendToBackground";
 import { getData } from "@/contents/ui/imageParser";
 import { MessagesToContent } from "@/messages";
-import { sendToBackground } from "@/sendToBackground";
 
 console.log("impt allimage injected:", location.href);
 const messageFunctions: MessagesToContent = {

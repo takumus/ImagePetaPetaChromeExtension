@@ -1,7 +1,7 @@
 import { InjectionKey, readonly, ref } from "vue";
 
 import { InjectedData } from "@/@types/injectedData";
-import { sendToBackground } from "@/sendToBackground";
+import { sendToBackground } from "@/commons/sendToBackground";
 
 export async function createInjectedDataStore(injectData: InjectedData) {
   return injectData;

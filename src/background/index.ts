@@ -7,8 +7,8 @@ import { _alert } from "@/background/alert";
 import { checkApp } from "@/background/checkApp";
 import { getCurrentTab } from "@/background/getCurrentTab";
 import { sendToApp } from "@/commons/sendToApp";
+import { sendToContent } from "@/commons/sendToContent";
 import { MessagesToBackground } from "@/messages";
-import { sendToContent } from "@/sendToContent";
 
 let order:
   | {
