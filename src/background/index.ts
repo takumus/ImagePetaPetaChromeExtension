@@ -2,9 +2,7 @@ import {
   ImportFileAdditionalData,
   ImportFileGroup,
 } from "imagepetapeta-beta/src/commons/datas/importFileGroup";
-import { v4 } from "uuid";
 
-import { InjectedData } from "@/@types/injectedData";
 import { _alert } from "@/background/alert";
 import { checkApp } from "@/background/checkApp";
 import { getCurrentTab } from "@/background/getCurrentTab";
@@ -27,7 +25,6 @@ type MessagesToBackgroundType = {
     ...args: Parameters<MessagesToBackground[P]>
   ) => ReturnType<MessagesToBackground[P]>;
 };
-const injectId = v4();
 const messageFunctions: MessagesToBackgroundType = {
   async orderSave(sender, urls, referrer, ua, additionalData) {
     order = {
@@ -113,9 +110,6 @@ const messageFunctions: MessagesToBackgroundType = {
       ] as ImportFileGroup,
     ]);
   },
-  async getInjectId() {
-    return injectId;
-  },
   async addPageDownloaderDatas(_event, urls) {
     await sendToApp("addPageDownloaderDatas", [urls]);
   },
@@ -128,50 +122,11 @@ const messageFunctions: MessagesToBackgroundType = {
       requestPageDownloaderDatas(tab.id, inView);
     }
   },
-};
-async function inject(tabId: number) {
-  try {
-    const [{ result }] = await chrome.scripting.executeScript({
-      target: { tabId },
-      func: async (injectId) => {
-        if ((window as any)[injectId] !== undefined) {
-          return false;
-        }
-        (window as any)[injectId] = {};
-        return true;
-      },
-      args: [injectId],
-    });
-    if (!result) {
-      return;
-    }
+  async getInjectStyle() {
     const style = await (await fetch(chrome.runtime.getURL("content/assets/index.css"))).text();
-    await chrome.scripting.executeScript({
-      target: { tabId },
-      func: (injectId: string, styleString: string) => {
-        const root = document.createElement("div");
-        const rootShadow = root.attachShadow({ mode: "closed" });
-        const app = document.createElement("div");
-        const style = document.createElement("style");
-        style.innerHTML = styleString;
-        style.style.display = "none";
-        rootShadow.append(style);
-        rootShadow.append(app);
-        document.body.append(root);
-        const injectedData = (window as any)[injectId] as InjectedData;
-        injectedData.domApp = app;
-        injectedData.domRoot = root;
-      },
-      args: [injectId, style],
-    });
-    await chrome.scripting.executeScript({
-      target: { tabId },
-      files: ["./content/assets/index.js"],
-    });
-  } catch {
-    //
-  }
-}
+    return style;
+  },
+};
 async function requestPageDownloaderDatas(tabId: number, inView: boolean) {
   console.log("GAI");
   if (!(await checkApp())) {
@@ -180,11 +135,8 @@ async function requestPageDownloaderDatas(tabId: number, inView: boolean) {
   await sendToApp("openPageDownloader", []);
   await sendToContent(tabId, "requestPageDownloaderDatas", inView);
 }
-chrome.tabs.onActivated.addListener((info) => {
-  inject(info.tabId);
-});
-chrome.tabs.onUpdated.addListener((tabId) => {
-  inject(tabId);
+chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
+  console.log(changeInfo.status);
 });
 chrome.runtime.onMessage.addListener((request, sender, response) => {
   // console.log(request, sender);

@@ -43,5 +43,11 @@ export const manifest: chrome.runtime.Manifest = {
       run_at: "document_end",
       all_frames: true,
     },
+    {
+      matches: ["<all_urls>"],
+      js: ["content/assets/index.js"],
+      run_at: "document_end",
+      all_frames: false,
+    },
   ],
 };

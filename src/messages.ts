@@ -20,10 +20,10 @@ export interface MessagesToBackground {
   save: () => Promise<string[] | undefined>;
   setRightClickEnable: (value: boolean) => Promise<void>;
   getRightClickEnable: () => Promise<boolean>;
-  getInjectId: () => Promise<string>;
   clearImageURLs: () => Promise<void>;
   addPageDownloaderDatas: (urls: PageDownloaderData) => Promise<void>;
   requestPageDownloaderDatas: (inView: boolean) => Promise<void>;
+  getInjectStyle: () => Promise<string>;
 }
 export interface MessagesToContent {
   openMenu: () => Promise<void>;
