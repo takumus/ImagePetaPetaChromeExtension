@@ -39,13 +39,13 @@ export const manifest: chrome.runtime.Manifest = {
   content_scripts: [
     {
       matches: ["<all_urls>"],
-      js: ["getAllURL.js"],
+      js: ["contents/pageDownloader/index.js"],
       run_at: "document_end",
       all_frames: true,
     },
     {
       matches: ["<all_urls>"],
-      js: ["content/assets/index.js"],
+      js: ["contents/ui/index.js"],
       run_at: "document_end",
       all_frames: false,
     },

@@ -23,9 +23,9 @@ import VImageButtons from "./VImageButtons.vue";
 import { inject, onMounted, ref } from "vue";
 
 import { ImageInfo } from "@/@types/imageInfo";
-import VBoxes from "@/content/components/VBoxes.vue";
-import { getData, ImageParserResult } from "@/content/imageParser";
-import { injectedDataStoreKey } from "@/content/injectedData";
+import VBoxes from "@/contents/ui/components/VBoxes.vue";
+import { getData, ImageParserResult } from "@/contents/ui/imageParser";
+import { injectedDataStoreKey } from "@/contents/ui/injectedData";
 import { icon, subIcon } from "@/icon";
 import { MessagesToContent } from "@/messages";
 import { sendToBackground } from "@/sendToBackground";

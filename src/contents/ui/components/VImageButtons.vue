@@ -30,7 +30,7 @@
 import { computed, onMounted, ref } from "vue";
 
 import { ImageInfo } from "@/@types/imageInfo";
-import { getImageExtension } from "@/content/getImageExtension";
+import { getImageExtension } from "@/contents/ui/getImageExtension";
 
 const props = defineProps<{
   urls: string[];

@@ -7,7 +7,7 @@ import { defineConfig } from "vite";
 export default defineConfig({
   build: {
     minify: false,
-    outDir: resolve("./dist/"),
+    outDir: resolve("./dist/contents/pageDownloader"),
     emptyOutDir: false,
     rollupOptions: {
       output: {
@@ -15,10 +15,8 @@ export default defineConfig({
       },
     },
     lib: {
-      entry: {
-        getAllURL: resolve("./src/getAllURL.ts"),
-      },
-      name: "getAllURL",
+      entry: resolve("./src/contents/pageDownloader/index.ts"),
+      name: "pageDownloader",
       formats: ["iife"],
       // fileName: "background",
     },

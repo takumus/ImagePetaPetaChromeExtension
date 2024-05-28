@@ -123,7 +123,7 @@ const messageFunctions: MessagesToBackgroundType = {
     }
   },
   async getInjectStyle() {
-    const style = await (await fetch(chrome.runtime.getURL("content/assets/index.css"))).text();
+    const style = await (await fetch(chrome.runtime.getURL("contents/ui/index.css"))).text();
     return style;
   },
 };
@@ -198,5 +198,5 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 // const style = await (
-//   await fetch(chrome.runtime.getURL("popup/assets/index-BGiOXsqW.css"))
+//   await fetch(chrome.runtime.getURL("popup/index-BGiOXsqW.css"))
 // ).text();

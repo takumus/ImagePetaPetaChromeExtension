@@ -1,5 +1,5 @@
-import { pinterest } from "@/content/drivers/pinterest";
-import { twitter } from "@/content/drivers/twitter";
+import { pinterest } from "@/contents/ui/drivers/pinterest";
+import { twitter } from "@/contents/ui/drivers/twitter";
 
 // export const urlDrivers = [pinterest, twitter];
 export function transFormURLs(urls: string[]) {

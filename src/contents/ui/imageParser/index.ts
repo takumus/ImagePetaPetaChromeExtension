@@ -1,5 +1,5 @@
-import { transFormURLs } from "@/content/drivers";
-import { getURLsFromElement } from "@/content/imageParser/getURLsFromElement";
+import { transFormURLs } from "@/contents/ui/drivers";
+import { getURLsFromElement } from "@/contents/ui/imageParser/getURLsFromElement";
 
 export interface ImageParserResult {
   element: HTMLElement;

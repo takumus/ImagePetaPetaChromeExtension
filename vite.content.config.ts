@@ -4,18 +4,17 @@ import { defineConfig } from "vite";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  root: resolve("./src/content"),
-  publicDir: resolve("./src/content/public"),
+  root: resolve("./src/contents/ui"),
+  publicDir: resolve("./src/contents/ui/public"),
   base: "./",
   build: {
     emptyOutDir: !process.argv.includes("--dev"),
-    outDir: resolve("./dist/content"),
+    outDir: resolve("./dist/contents/ui"),
     minify: false,
     rollupOptions: {
       output: {
-        entryFileNames: `assets/[name].js`,
-        chunkFileNames: `assets/[name].js`,
-        assetFileNames: `assets/[name].[ext]`,
+        entryFileNames: `[name].js`,
+        assetFileNames: `[name].[ext]`,
       },
       plugins: [
         {

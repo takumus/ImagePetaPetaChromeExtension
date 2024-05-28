@@ -1,4 +1,4 @@
-import { getData } from "@/content/imageParser";
+import { getData } from "@/contents/ui/imageParser";
 import { MessagesToContent } from "@/messages";
 import { sendToBackground } from "@/sendToBackground";
 

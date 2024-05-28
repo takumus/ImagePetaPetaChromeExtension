@@ -4,8 +4,8 @@
   </e-boxes-root>
 </template>
 <script setup lang="ts">
-import VBox from "@/content/components/VBox.vue";
-import { ImageParserResult } from "@/content/imageParser";
+import VBox from "@/contents/ui/components/VBox.vue";
+import { ImageParserResult } from "@/contents/ui/imageParser";
 
 defineProps<{
   imageParserResult: ImageParserResult[];
