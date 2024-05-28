@@ -7,7 +7,7 @@
         top: menuPosition.y + 'px',
       }">
       <e-icon>
-        <img :src="icon" />
+        <!-- <img :src="icon" /> -->
         <e-label>ImagePetaPeta</e-label>
       </e-icon>
       <e-buttons>
@@ -27,7 +27,6 @@ import { sendToBackground } from "@/commons/sendToBackground";
 import VBoxes from "@/contents/ui/components/VBoxes.vue";
 import { getData, ImageParserResult } from "@/contents/ui/imageParser";
 import { injectedDataStoreKey } from "@/contents/ui/injectedData";
-import { icon, subIcon } from "@/icon";
 import { MessagesToContent } from "@/messages";
 
 const urls = ref<string[]>([]);
@@ -196,28 +195,17 @@ onMounted(() => {
       //
     },
   };
-  if (injectedData.id === "dev") {
-    (window.document.querySelector("#img1") as HTMLImageElement).src = icon;
-    (window.document.querySelector("#img2") as HTMLImageElement).src = icon;
-    (window.document.querySelector("#img3") as HTMLImageElement).style.backgroundImage =
-      `url(${subIcon})`;
-    window.document.addEventListener("contextmenu", (e) => {
-      e.preventDefault();
-      messageFunctions.openMenu();
-    });
-  } else {
-    setInterval(async () => {
-      // enabledRightClick = await sendToBackground("getRightClickEnable");
-    }, 100);
-    chrome.runtime.onMessage.addListener((request, _, response) => {
-      (messageFunctions as any)[request.type](...request.args).then((res: any) => {
-        response({
-          value: res,
-        });
+  setInterval(async () => {
+    // enabledRightClick = await sendToBackground("getRightClickEnable");
+  }, 100);
+  chrome.runtime.onMessage.addListener((request, _, response) => {
+    (messageFunctions as any)[request.type](...request.args).then((res: any) => {
+      response({
+        value: res,
       });
-      return true;
     });
-  }
+    return true;
+  });
 });
 </script>
 <style lang="scss">
