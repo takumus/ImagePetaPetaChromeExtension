@@ -23,11 +23,11 @@ import VImageButtons from "./VImageButtons.vue";
 import { inject, onMounted, ref } from "vue";
 
 import { ImageInfo } from "@/@types/imageInfo";
+import { MessagesToContent } from "@/commons/messages";
 import { sendToBackground } from "@/commons/sendToBackground";
 import VBoxes from "@/contents/ui/components/VBoxes.vue";
 import { getData, ImageParserResult } from "@/contents/ui/imageParser";
 import { injectedDataStoreKey } from "@/contents/ui/injectedData";
-import { MessagesToContent } from "@/messages";
 
 const urls = ref<string[]>([]);
 const imgInfo = ref<{ [url: string]: ImageInfo | undefined }>({});

@@ -1,4 +1,4 @@
-import { MessagesToContent } from "@/messages";
+import { MessagesToContent } from "@/commons/messages";
 
 export function sendToContent<U extends keyof MessagesToContent>(
   tabId: number,

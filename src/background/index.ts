@@ -6,9 +6,9 @@ import {
 import { _alert } from "@/background/alert";
 import { checkApp } from "@/background/checkApp";
 import { getCurrentTab } from "@/background/getCurrentTab";
+import { MessagesToBackground } from "@/commons/messages";
 import { sendToApp } from "@/commons/sendToApp";
 import { sendToContent } from "@/commons/sendToContent";
-import { MessagesToBackground } from "@/messages";
 
 let order:
   | {

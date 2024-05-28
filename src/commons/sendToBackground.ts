@@ -1,4 +1,4 @@
-import { MessagesToBackground } from "@/messages";
+import { MessagesToBackground } from "@/commons/messages";
 
 export function sendToBackground<U extends keyof MessagesToBackground>(
   type: U,
