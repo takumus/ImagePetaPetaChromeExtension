@@ -58,7 +58,7 @@
   },
   "dependencies": {
     "file-type": "^19.0.0",
-    "imagepetapeta-beta": "git+ssh://git@github.com/takumus/ImagePetaPeta.git#df056898ebe32c1a05638716c149f4bc311c3879",
+    "imagepetapeta-beta": "git+ssh://git@github.com/takumus/ImagePetaPeta.git#aed2894054920f2af35b721698850f807636f65c",
     "throttle-debounce": "^5.0.0",
     "url-join": "^5.0.0",
     "uuid": "^9.0.1",

@@ -47,7 +47,7 @@ const messageFunctions: MessagesToBackgroundType = {
     const { urls, referrer, additionalData, ua } = order;
     order = undefined;
     try {
-      const result = await sendToApp("importFiles", [
+      const result = await sendToApp("common", "importFiles", [
         [
           ...urls.map(
             (url: string) =>
@@ -97,7 +97,7 @@ const messageFunctions: MessagesToBackgroundType = {
         canvas.convertToBlob({ quality: 100 }).then(reader.readAsDataURL.bind(reader));
       });
     }
-    return await sendToApp("importFiles", [
+    return await sendToApp("common", "importFiles", [
       [
         {
           type: "url",
@@ -111,7 +111,7 @@ const messageFunctions: MessagesToBackgroundType = {
     ]);
   },
   async addPageDownloaderDatas(_event, urls) {
-    await sendToApp("addPageDownloaderDatas", [urls]);
+    await sendToApp("common", "addPageDownloaderDatas", [urls]);
   },
   async clearImageURLs(event) {
     //
@@ -132,7 +132,7 @@ async function requestPageDownloaderDatas(tabId: number, inView: boolean) {
   if (!(await checkApp())) {
     return undefined;
   }
-  await sendToApp("openPageDownloader", []);
+  await sendToApp("common", "openPageDownloader", []);
   await sendToContent(tabId, "requestPageDownloaderDatas", inView);
 }
 chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {

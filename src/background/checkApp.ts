@@ -7,7 +7,7 @@ import { sendToApp } from "@/commons/sendToApp";
 export async function checkApp() {
   try {
     const appInfo = await new Promise<AppInfo>((res, rej) => {
-      sendToApp("getAppInfo").then(res).catch(rej);
+      sendToApp("common", "getAppInfo").then(res).catch(rej);
       setTimeout(rej, 500);
     });
     const version = appInfo.chromeExtensionVersion ?? 0;
